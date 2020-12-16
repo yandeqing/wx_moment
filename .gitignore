@@ -1,7 +1,6 @@
 /venv/
 .idea
 /dist
-/wxfriend/pic/*
 /wxfriend/pic/WeiXin/*
 /wxfriend/pic/WeiXinCopy/*
 /wxfriend/excel/pic/*
