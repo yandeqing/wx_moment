@@ -1,0 +1,12 @@
+/venv/
+.idea
+/dist
+/wxfriend/pic/*
+/wxfriend/pic/WeiXin/*
+/wxfriend/pic/WeiXinCopy/*
+/wxfriend/excel/pic/*
+/wxfriend/excel/text/*
+/build
+window_main.spec
+*/.qiniu_pythonsdk_hostscache.json
+*/__pycache__
