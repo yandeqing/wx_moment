@@ -8,5 +8,6 @@
 /build
 window_main.spec
 */.qiniu_pythonsdk_hostscache.json
+.qiniu_pythonsdk_hostscache.json
 */__pycache__
 __pycache__/*
