@@ -19,6 +19,22 @@ class EventConst():
     WX_UPLOADER = 5
     WX_PICUPLOADER = 6
 
+class DownloadRunthread(QThread):
+    signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
+
+    def __init__(self, fuc_code=None):
+        super(DownloadRunthread, self).__init__()
+        self.fuc_code = fuc_code
+
+    def run(self):
+        try:
+            Logger.println(f"【DownloadRunthread()开始停止】")
+            from wxfriend import WxAppUploader
+            download = WxAppUploader.download(self.signals)
+            WxAppUploader.startfile(download)
+            Logger.println(f"【DownloadRunthread()任务已经停止】")
+        except Exception as e:
+            Logger.println(f"【run().e={e}】")
 
 class StopRunthread(QThread):
     signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
@@ -31,7 +47,7 @@ class StopRunthread(QThread):
         Logger.init(self.signals)
         try:
             Logger.println(f"【run()开始停止】")
-            wx_stop.Moments().main()
+            wx_stop.stopFlag=True
             Logger.println(f"【run()任务已经停止】")
         except Exception as e:
             Logger.println(f"【run().e={e}】")
@@ -53,6 +69,7 @@ class Runthread(QThread):
 
     def run(self):
         Logger.init(self.signals)
+        wx_stop.stopFlag=False
         try:
             if self.fuc_code == EventConst.MAIN_BULK_ADDFRIEND:
                 main_bulk_addfriend.Moments().main()

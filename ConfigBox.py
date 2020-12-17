@@ -1,7 +1,8 @@
 import sys
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QDialog, QDialogButtonBox, \
+    QApplication
 from qtpy import QtCore, QtWidgets
 
 from common import FilePathUtil
@@ -40,6 +41,12 @@ class ConfigDialog(QDialog):
         self.le3.setText(add_friend_max_count)
         layout.addRow(self.label, self.le3)
 
+        self.label = QLabel("添加好友时间间隔(秒):")
+        self.le31 = QLineEdit()
+        addfriend_inte_seconds = WxConfig.get_addfriend_inte_seconds()
+        self.le31.setText(addfriend_inte_seconds)
+        layout.addRow(self.label, self.le31)
+
         self.addbtn = QPushButton("设置手机号文件地址")
         self.addbtn.clicked.connect(self.add_phone_excel)  # 当点击save按钮时，对话框将会消失，点击Cacel按钮时，则不会消失。
         self.le4 = QLineEdit()
@@ -65,6 +72,8 @@ class ConfigDialog(QDialog):
         WxConfig.setServerUrl(server_url)
         max = self.le3.text()
         WxConfig.set_friend_max_count(max)
+        addfriend_inte_seconds = self.le31.text()
+        WxConfig.set_get_addfriend_inte_seconds(addfriend_inte_seconds)
         self.close()
 
     def reconnect(self):

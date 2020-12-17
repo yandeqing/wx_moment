@@ -11,10 +11,8 @@ from time import sleep
 from appium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
-from common import excel_util, time_util, FilePathUtil
+from common import excel_util, time_util, FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend.WxConfig import DRIVER_SERVER, \
-    TIMEOUT
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -81,9 +79,9 @@ class Moments(MomentsBase):
                     'content': b_e_content,
                     'phone': phone
                 }
-                print(f"【crawl({i}).data={data}】")
+                Logger.println(f"【crawl({i}).data={data}】")
                 if self.wx_content_md5 == md5_:
-                    print(f"【crawl{i}已经抓取到上一次位置({md5_}).data={data}】")
+                    Logger.println(f"【crawl{i}已经抓取到上一次位置({md5_}).data={data}】")
                     self.config.set_value("wx_content", "md5_more", md5_contents[0])
                     break
                 if md5_ in md5_contents:

@@ -12,13 +12,15 @@ mSignal: pyqtSignal = None
 
 
 def println(msg):
+    import time
+    strftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not debug:
         return
-    global  mSignal
+    global mSignal
     if mSignal is None:
-        print(msg)
+        print(strftime + msg)
     else:
-        mSignal.emit(str(msg))
+        mSignal.emit(strftime + str(msg))
     pass
 
 

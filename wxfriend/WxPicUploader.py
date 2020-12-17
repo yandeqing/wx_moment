@@ -13,6 +13,7 @@ import requests
 from qiniu import put_file
 
 from common import FilePathUtil, excel_util, time_util, Logger
+from wxfriend import wx_stop
 
 
 def put_img(md5, file_ids):
@@ -25,7 +26,7 @@ def put_img(md5, file_ids):
     item = {'content_md5': md5, 'file_ids': file_ids}
     Logger.println(f"【put_img().item={item}】")
     try:
-        res = requests.put("http://internal.zuker.im/moment/file",
+        res = requests.put("http://internal.zuker.im/moment",
                            json=item)
         res_json = res.json()
         jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
@@ -49,10 +50,6 @@ def files_token(type='image', count=1):
         return None
 
 
-def put_by_md5(md5, count):
-    tokens = files_token(count)
-    for item in tokens:
-        pass
 
 
 def upload_img(token, file):
@@ -70,11 +67,13 @@ def main_backgroud():
 
 
 def main(full_dir):
-    sheetname = os.path.basename(full_dir)[0:8]
+    sheetname = os.path.basename(full_dir)[0:11]
     Logger.println(f"【().excel={full_dir}】")
     Logger.println(f"【().sheetname={sheetname}】")
     array = excel_util.excel2array(full_dir, sheetname)
     for index, item in enumerate(array):
+        if wx_stop.stopFlag:
+            break
         content_md5 = item['content_md5']
         Logger.println(f"【().content_md5={content_md5}】")
         files = FilePathUtil.get_files_by_dir(

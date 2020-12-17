@@ -12,6 +12,7 @@ from time import sleep
 
 from common import excel_util, time_util, FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
+from wxfriend import wx_stop
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -49,6 +50,8 @@ class Moments(MomentsBase):
         contents = []
         md5_contents = []
         while True:
+            if wx_stop.stopFlag:
+                break
             if i > 0:
                 # 上滑
                 self.swipe_up()
@@ -90,6 +93,11 @@ class Moments(MomentsBase):
                     full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                          date + "wx_moments.xls")
                     excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
+                    if len(md5_contents) > 1:
+                        md5 = ','.join(md5_contents[0:2])
+                    else:
+                        md5 = md5_contents[0]
+                    self.config.set_value("wx_content", "md5", md5)
 
     def main(self):
         """

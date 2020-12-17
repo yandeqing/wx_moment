@@ -12,6 +12,7 @@ from appium.webdriver.common.touch_action import TouchAction
 
 from common import FilePathUtil, time_util, excel_util, Logger
 from config.AppConfig import MonitorConfig
+from wxfriend import wx_stop
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -50,6 +51,8 @@ class Moments(MomentsBase):
         contents = []
         last_base_md5 = None
         while True:
+            if wx_stop.stopFlag:
+                break
             if index > 0:
                 # 上滑
                 self.swipe_up()
@@ -60,10 +63,47 @@ class Moments(MomentsBase):
             for item in items:
                 b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
                 if b_e_content is None:
-                    if index == 0:
-                        index = +1
-                    continue
+                    content_element = self.getContentTextById("com.tencent.mm:id/b_m", item)
+                    if content_element:
+                        content_element.click()
+                        sleep(2)
+                        b_e_content = self.getContentTextById('com.tencent.mm:id/fpu', item)
+                    else:
+                        if index == 0:
+                            index = +1
+                        continue
+                nickName = self.getNickName(item)
                 md5_ = self.MD5(b_e_content)
+                if md5_ in self.wx_content_md5:
+                    Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
+                    if len(md5_contents) > 1:
+                        md5 = ','.join(md5_contents[0:2])
+                    else:
+                        md5 = md5_contents[0]
+                    self.config.set_value("wx_content", "md5_pic", md5)
+                    break
+                phone = self.get_phone(b_e_content)
+                nick_name_element = self.getNickNameElement(item)
+                wx_number = ""
+                if nick_name_element:
+                    try:
+                        nick_name_element.click()
+                        sleep(1)
+                        by_xpath = self.find_element_by_xpath("//*[contains(@text,'微信号:')]")
+                        if by_xpath:
+                            wx_number = by_xpath.get_attribute("text").replace('微信号:', '').strip()
+                            Logger.println(f"【微信号={wx_number}】")
+                            xpath = self.find_element_by_xpath("//*[contains(@text,'电话号码')]")
+                            if xpath:
+                                phone_parent = xpath.parent
+                                phone = self.getPhone(phone_parent)
+                                Logger.println(f"【phone={phone}】")
+                                sleep(1)
+                            self.driver.back()
+                    except  Exception  as e:
+                        Logger.println(f"【nick_name_element.click.e={e}】")
+                        pass
+
                 if md5_ in md5_contents:
                     continue
                 image0 = self.find_element_by_xpath(
@@ -71,7 +111,7 @@ class Moments(MomentsBase):
                 if image0:
                     image0.click()
                     sleep(1)
-                    start = 0
+                    start = '0'
                     for index_img in range(9):
                         image_detail = self.find_element_by_id('com.tencent.mm:id/c9h')
                         if image_detail:
@@ -81,6 +121,11 @@ class Moments(MomentsBase):
                                 end = FilePathUtil.get_time()
                                 data = {
                                     'content_md5': md5_,
+                                    'nick_name': nickName,
+                                    'wx_number': wx_number,
+                                    'content': b_e_content,
+                                    'phone': phone,
+                                    'file_ids': '',
                                     'start': start,
                                     'end': end,
                                     'count': str(index_img)
@@ -110,6 +155,11 @@ class Moments(MomentsBase):
                                 end = FilePathUtil.get_time()
                                 data = {
                                     'content_md5': md5_,
+                                    'nick_name': nickName,
+                                    'wx_number': wx_number,
+                                    'content': b_e_content,
+                                    'phone': phone,
+                                    'file_ids': '',
                                     'start': start,
                                     'end': end,
                                     'count': str(index_img + 1)
@@ -125,10 +175,11 @@ class Moments(MomentsBase):
                                                      date + "wx_pic_moments.xls")
                 excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
                 index += 1
-                if self.wx_content_md5 == md5_:
-                    Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
-                    self.config.set_value("wx_content", "md5_pic", md5_contents[0])
-                    break
+                if len(md5_contents) > 1:
+                    md5 = ','.join(md5_contents[0:2])
+                else:
+                    md5 = md5_contents[0]
+                self.config.set_value("wx_content", "md5_pic", md5)
 
 
     def main(self):
@@ -144,6 +195,7 @@ class Moments(MomentsBase):
     def main_backgroud(self):
         thread = threading.Thread(target=self.main)
         thread.start()
+
 
 if __name__ == '__main__':
     moments = Moments()

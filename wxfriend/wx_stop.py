@@ -15,6 +15,7 @@ from config.AppConfig import MonitorConfig
 from wxfriend.PicClassfyUtil import stop_server
 from wxfriend.wx_swipe_base import MomentsBase
 
+stopFlag=False
 
 class Moments(MomentsBase):
     def __init__(self):

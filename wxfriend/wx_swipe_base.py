@@ -48,6 +48,28 @@ class MomentsBase():
         except:
             pass
 
+    def getPhone(self, driver=None):
+        driver = driver or self.driver
+        try:
+            xpath = driver.find_element_by_id('com.tencent.mm:id/ec9')
+            if xpath:
+                phone = xpath.find_element_by_xpath(
+                    '//android.widget.TextView').get_attribute("text")
+                return phone
+        except  Exception  as e:
+            Logger.println(f"【getPhone().e={e}】")
+            pass
+
+    def getNickNameElement(self, driver=None):
+        driver = driver or self.driver
+        try:
+            nickname_element = driver.find_element_by_id(
+                'com.tencent.mm:id/e3x')
+            return nickname_element
+        except:
+            return None
+            pass
+
     def get_phone(self, text):
         phone_reg = re.compile("([0-9]{2,4}[-.\s]{,1}){5}", re.MULTILINE)
         search = phone_reg.search(text)
@@ -106,6 +128,23 @@ class MomentsBase():
             y1 = int(size[1] * 0.8)  # 起始y坐标
             y2 = int(size[1] * 0.3)  # 终点y坐标
             self.driver.swipe(x1, y1, x1, y2, _time)
+            return True
+        except:
+            return False
+
+    def swipe_down(self, _time: int = 1000):
+        """
+        向上滑动
+        :param driver:
+        :param _time:
+        :return:
+        """
+        try:
+            size = self.screen_size
+            x1 = int(size[0] * 0.5)  # 起始x坐标
+            y1 = int(size[1] * 0.8)  # 起始y坐标
+            y2 = int(size[1] * 0.3)  # 终点y坐标
+            self.driver.swipe(x1, y2, x1, y1, _time)
             return True
         except:
             return False
@@ -180,7 +219,7 @@ class MomentsBase():
             return content_element.screenshot_as_base64
         except Exception as e:
             Logger.println(f"【save_screenshot().e={e}】")
-            return 'None'
+            return FilePathUtil.get_time()
 
     def save_screenshot(self, content_element, dir, file_name):
         """

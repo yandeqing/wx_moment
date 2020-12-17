@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QAction, QInputDialog, qApp
 from ConfigBox import ConfigDialog
 from common import Logger, FilePathUtil
 from common.FilePathUtil import startfile
-from wxfriend import WxConfig
+from wxfriend import WxConfig, WxAppUploader
 from wxfriend.window_main_function_manager import Runthread, EventConst, StopRunthread
 
 
@@ -34,6 +34,10 @@ class MainUi(QtWidgets.QMainWindow):
     def openPicDir(self):
         startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
+    def download(self):
+        startfile(FilePathUtil.get_full_dir('dist', 'UpgradeHelper.exe'))
+        self.close()
+
     def openPhoneDir(self):
         startfile(FilePathUtil.get_full_dir('wxfriend', 'excel'))
 
@@ -54,6 +58,10 @@ class MainUi(QtWidgets.QMainWindow):
         picAction.setStatusTip('图片文件夹')
         picAction.triggered.connect(self.openPicDir)
 
+        downloadAction = QAction(QIcon('exit.png'), '下载最新版本', self)
+        downloadAction.setStatusTip('下载最新版本')
+        downloadAction.triggered.connect(self.download)
+
         # 底部状态栏
         self.statusBar().showMessage('状态栏')
 
@@ -64,6 +72,8 @@ class MainUi(QtWidgets.QMainWindow):
         fileMenu.addAction(configAction)
         picMenu = menubar.addMenu('打开图片文件夹')
         picMenu.addAction(picAction)
+        downloadMenu = menubar.addMenu('版本更新')
+        downloadMenu.addAction(downloadAction)
 
         openAction = QAction(QIcon('./uploader.png'), '打开手机号配置目录', self)
         openAction.setShortcut('Ctrl+O')
@@ -89,9 +99,9 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_label_0.setObjectName('left_label')
         self.left_label_01 = QtWidgets.QPushButton("批量修改备注为手机号")
         self.left_label_01.setObjectName('left_label')
-        self.left_label_1 = QtWidgets.QPushButton("导出朋友圈文本")
+        self.left_label_1 = QtWidgets.QPushButton("导出有图片的文本朋友圈信息")
         self.left_label_1.setObjectName('left_label')
-        self.left_label_2 = QtWidgets.QPushButton("导出朋友圈图片")
+        self.left_label_2 = QtWidgets.QPushButton("导出文本朋友圈信息")
         self.left_label_2.setObjectName('left_label')
         self.left_label_3 = QtWidgets.QPushButton("导出图片到电脑")
         self.left_label_3.setObjectName('left_label')
@@ -125,8 +135,8 @@ class MainUi(QtWidgets.QMainWindow):
 
         self.runthread0 = Runthread(EventConst.MAIN_BULK_ADDFRIEND)
         self.runthread01 = Runthread(EventConst.MAIN_BULK_M_NAME)
-        self.runthread1 = Runthread(EventConst.WX_MAIN)
-        self.runthread2 = Runthread(EventConst.WX_MAIN_PIC)
+        self.runthread1 = Runthread(EventConst.WX_MAIN_PIC)
+        self.runthread2 = Runthread(EventConst.WX_MAIN)
         self.runthread3 = Runthread(EventConst.PICCLASSFY)
         self.runthread4 = Runthread(EventConst.WX_UPLOADER)
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
@@ -159,8 +169,11 @@ class MainUi(QtWidgets.QMainWindow):
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         # self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.main_layout.setSpacing(0)
-
-        self.statusBar().showMessage('Ready')
+        excel = WxConfig.getPhoneExcel()
+        if excel:
+            self.statusBar().showMessage(f'手机号文件地址:{excel}')
+        else:
+            self.statusBar().showMessage(f'请先点击配置菜单配置数据')
 
     def call_backlog(self, text):
         self.right_label.append(f"{text}")
@@ -184,7 +197,7 @@ class MainUi(QtWidgets.QMainWindow):
             pass
 
     def clickLabel1(self):
-        self.call_backlog("正在导出朋友圈文本,请稍后...")
+        self.call_backlog("正在导出有图片的文本朋友圈信息,请稍后...")
         try:
             self.left_label_1.setEnabled(False)
             self.runthread1.start()
@@ -193,7 +206,7 @@ class MainUi(QtWidgets.QMainWindow):
             pass
 
     def clickLabel2(self):
-        self.call_backlog("正在导出朋友圈图片,请稍后...")
+        self.call_backlog("导出文本朋友圈信息,请稍后...")
         try:
             self.left_label_2.setEnabled(False)
             self.runthread2.start()

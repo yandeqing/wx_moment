@@ -7,13 +7,13 @@
 
 # from pymongo import MongoClient
 import threading
-from time import sleep
+from time import sleep, time
 
 from PyQt5.QtCore import QBasicTimer, QTimer
 
 from common import excel_util, FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend import WxConfig
+from wxfriend import WxConfig, wx_stop
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -24,6 +24,8 @@ class Moments(MomentsBase):
         """
         # 驱动配置
         super().__init__()
+        self.max_count = int(WxConfig.get_add_friend_max_count())
+        self.addfriend_inte_seconds = int(WxConfig.get_addfriend_inte_seconds())
         self.config = MonitorConfig()
         self.last_record_phone = self.config.get_value("wx_content", "add_friend_last_phone")
 
@@ -106,30 +108,48 @@ class Moments(MomentsBase):
             Logger.println(f"【main(请先配置手机号列表文件】")
             return
         array = excel_util.excel2array(full_dir, "手机号列表")
+        length = len(array)
         if not array:
             Logger.println(f"【main(请先配置手机号列表文件的sheet_name为手机号列表】")
             return
         # array = [{'手机': '18612205027'}]
         # array = [{'手机': '18612205027'}, {'手机': '15821902923'}]
-        start_index = -1
-        count = 0
-        for index, item in enumerate(array):
-            phone = str(int(item['手机']))
-            if self.last_record_phone == phone:
-                Logger.println(f"【main({index}).上次添加的手机={phone}】")
+        start_index = 0
+        for index, element in enumerate(array):
+            if str(int(element["手机"])) == self.last_record_phone:
                 start_index = index
-            if index > start_index:
-                Logger.println(f"【main({index}).开始添加手机={phone}】")
-                Logger.println(f"【main开始执行第{count}个任务】")
-                max_count = int(WxConfig.get_add_friend_max_count())
-                if count > max_count:
-                    sleeptime = get_sleep(3600, 4800)
-                    Logger.println(f"【main(暂时停止任务).{sleeptime}秒后执行第={count}个任务】")
-                    sleep(sleeptime)
-                if self.add(phone):
-                    break
-                count += 1
-                Logger.println(f"【main(花费时间).total_count={total_count}s】")
+                Logger.println(f"【main找到上次添加的手机位置={start_index + 1}={self.last_record_phone}】")
+                break
+        count = 0
+        if start_index + 1 > length:
+            Logger.println(f"【已经是最后一条了】")
+            return
+        for index, item in enumerate(array[start_index + 1:length]):
+            if wx_stop.stopFlag:
+                break
+            phone = str(int(item['手机']))
+            Logger.println(f"【main({index}).开始添加手机={phone}】")
+            Logger.println(f"【main开始执行第{count}个任务】")
+            if self.max_count > 1 and count > 1 and (count % self.max_count) == 0:
+                start_time = int(time())
+                sleeptime = self.addfriend_inte_seconds
+                Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={count}个任务】")
+                while True:
+                    rdsleep = get_sleep(5, 6)
+                    if rdsleep == 5:
+                        self.swipe_down()
+                    else:
+                        self.swipe_up()
+                    sleep(rdsleep)
+                    if int(time()) - start_time > sleeptime:
+                        break
+                Logger.println(f"【main(退出休闲模式)继续执行第={count}个任务】")
+            if wx_stop.stopFlag:
+                break
+            if self.add(phone):
+                break
+            count += 1
+            Logger.println(f"【main(花费时间).total_count={total_count}s】")
         # self.add('13120749104')
 
     def main_backgroud(self):

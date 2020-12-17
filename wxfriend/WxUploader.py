@@ -12,6 +12,8 @@ from urllib import request
 import requests
 
 from common import FilePathUtil, excel_util, Logger
+from wxfriend import wx_stop
+
 
 def main_backgroud():
     thread = threading.Thread(target=main)
@@ -25,6 +27,8 @@ def main(full_dir):
     array = array[::-1]
     count = 0
     for index, item in enumerate(array):
+        if wx_stop.stopFlag:
+            break
         Logger.println(f"【({index}).item={item}】")
         res = requests.post("http://internal.zuker.im/moment", json=item)
         jsonstr =json.dumps(res.json(),indent=4,ensure_ascii=False)

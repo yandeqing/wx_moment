@@ -23,6 +23,18 @@ def set_friend_max_count(addFriendMaxCount):
     return config.set_value('appiumConfig', 'addFriendMaxCount', addFriendMaxCount)
 
 
+def get_addfriend_inte_seconds():
+    addfriend_inte_seconds = config.get_value('appiumConfig', 'addfriend_inte_seconds')
+    Logger.println(f"【get_addfriend_inte_seconds={addfriend_inte_seconds}】")
+    if not addfriend_inte_seconds:
+        return '3600'
+    return addfriend_inte_seconds
+
+
+def set_get_addfriend_inte_seconds(addfriend_inte_seconds):
+    return config.set_value('appiumConfig', 'addfriend_inte_seconds', addfriend_inte_seconds)
+
+
 def getServerUrl():
     driver_server = config.get_value('appiumConfig', 'driver_server')
     Logger.println(f"【服务器地址={driver_server}】")
@@ -38,6 +50,17 @@ def getPhoneExcel():
 def setPhoneExcel(phone_excel):
     Logger.println(f"【设置手机号excel文件={phone_excel}】")
     phone_excel = config.set_value('appiumConfig', 'phone_excel', phone_excel)
+    return phone_excel
+
+
+def getAppDownloadUrl():
+    app_download_url = config.get_value('appiumConfig', 'app_download_url')
+    Logger.println(f"【app_download_url={app_download_url}】")
+    return app_download_url
+
+
+def setAppDownloadUrl(app_download_url):
+    phone_excel = config.set_value('appiumConfig', 'app_download_url', app_download_url)
     return phone_excel
 
 
