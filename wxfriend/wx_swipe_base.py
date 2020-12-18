@@ -70,7 +70,7 @@ class MomentsBase():
             return None
             pass
 
-    def get_phone(self, text):
+    def get_phone_from_txt(self, text):
         phone_reg = re.compile("([0-9]{2,4}[-.\s]{,1}){5}", re.MULTILINE)
         search = phone_reg.search(text)
         if search and search.group:

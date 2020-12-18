@@ -87,7 +87,20 @@ class Moments(MomentsBase):
             pass
         sleep(get_sleep(2, 3))
         try:
-            self.find_element_by_id('com.tencent.mm:id/b0a').send_keys(phone)
+            by_id = self.find_element_by_id('com.tencent.mm:id/b0a')
+            if by_id is None:
+                text = self.find_element_by_id('com.tencent.mm:id/b0j')
+                if text:
+                    text.click()
+                    sleep(get_sleep(1, 2))
+                    by_id = self.find_element_by_id('com.tencent.mm:id/b0a')
+            if by_id:
+                attribute = by_id.get_attribute('text')
+                if attribute == phone:
+                    Logger.println(f"【main({phone}备注已经是手机号无需修改】")
+                else:
+                    by_id.send_keys(phone)
+                pass
             sleep(get_sleep(1, 2))
             # 点击保存
             by_xpath = self.find_element_by_xpath("//*[contains(@text,'保存')]")
@@ -96,8 +109,11 @@ class Moments(MomentsBase):
                 Logger.println(f"【add().phone={phone}】")
                 self.config.set_value("wx_content", "last_phone", phone)
             else:
-                self.find_element_by_xpath("//*[contains(@text,'完成')]").click()
-                self.config.set_value("wx_content", "last_phone", phone)
+                element_by_xpath = self.find_element_by_xpath("//*[contains(@text,'完成')]")
+                if element_by_xpath:
+                    element_by_xpath.click()
+                    Logger.println(f"【add().phone={phone}】")
+                    self.config.set_value("wx_content", "last_phone", phone)
         except Exception as e:
             Logger.println(f"【add().e={e}】")
             sleep(get_sleep(1, 2))
@@ -105,16 +121,6 @@ class Moments(MomentsBase):
             sleep(get_sleep(1, 2))
         sleep(get_sleep(1, 2))
         self.driver.back()
-        # 点击添加好友
-        # .find_element_by_xpath('
-        # self.driver.find_element_by_xpath(
-        #     "//android.widget.TextView[contains(@text,'添加到通讯录')]").click()
-        # sleep(3)
-        # send_btn = self.driver.find_element_by_xpath(
-        #     "//android.widget.Button[contains(@text,'发送')]")
-        # if send_btn:
-        #     send_btn.click()
-        # self.driver.back()
 
     def main(self):
         sleep(get_sleep(6, 10))
@@ -143,17 +149,20 @@ class Moments(MomentsBase):
             if wx_stop.stopFlag:
                 break
             phone = str(int(item['手机']))
-            Logger.println(f"【main开始执行第{count}个任务】")
+            Logger.println(f"【main开始执行{start_index + count+ 1}.第{count}个任务】")
             if self.max_count > 1 and count > 1 and (count % self.max_count) == 0:
                 start_time = int(time())
                 sleeptime = self.addfriend_inte_seconds
                 Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={count}个任务】")
                 while True:
                     rdsleep = get_sleep(5, 6)
+                    by_id = self.find_element_by_id('com.tencent.mm:id/bhn')
                     if rdsleep == 5:
-                        self.swipe_down()
+                        if by_id:
+                            by_id.send_keys(f'已经休眠{int(time()) - start_time}s')
                     else:
-                        self.swipe_up()
+                        if by_id:
+                            by_id.send_keys('')
                     sleep(rdsleep)
                     if int(time()) - start_time > sleeptime:
                         break
@@ -183,4 +192,4 @@ def get_sleep(start: int = 1, end: int = 9):
 
 if __name__ == '__main__':
     moments = Moments()
-    moments.main_backgroud()
+    moments.main()

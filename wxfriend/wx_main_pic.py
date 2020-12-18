@@ -50,6 +50,7 @@ class Moments(MomentsBase):
         md5_contents = []
         contents = []
         last_base_md5 = None
+        finished=False
         while True:
             if wx_stop.stopFlag:
                 break
@@ -60,6 +61,8 @@ class Moments(MomentsBase):
             items = self.find_elements_by_id("com.tencent.mm:id/fn9")
             if items is None:
                 continue
+            if finished:
+                break
             for item in items:
                 b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
                 if b_e_content is None:
@@ -73,39 +76,46 @@ class Moments(MomentsBase):
                             index = +1
                         continue
                 nickName = self.getNickName(item)
+                phone = ""
                 md5_ = self.MD5(b_e_content)
                 if md5_ in self.wx_content_md5:
                     Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
+                    md5 = None
                     if len(md5_contents) > 1:
                         md5 = ','.join(md5_contents[0:2])
-                    else:
+                    elif len(md5_contents) > 0:
                         md5 = md5_contents[0]
-                    self.config.set_value("wx_content", "md5_pic", md5)
+                    if md5:
+                        self.config.set_value("wx_content", "md5_pic", md5)
+                    finished=True
                     break
-                phone = self.get_phone(b_e_content)
-                nick_name_element = self.getNickNameElement(item)
-                wx_number = ""
-                if nick_name_element:
-                    try:
-                        nick_name_element.click()
-                        sleep(1)
-                        by_xpath = self.find_element_by_xpath("//*[contains(@text,'微信号:')]")
-                        if by_xpath:
-                            wx_number = by_xpath.get_attribute("text").replace('微信号:', '').strip()
-                            Logger.println(f"【微信号={wx_number}】")
-                            xpath = self.find_element_by_xpath("//*[contains(@text,'电话号码')]")
-                            if xpath:
-                                phone_parent = xpath.parent
-                                phone = self.getPhone(phone_parent)
-                                Logger.println(f"【phone={phone}】")
-                                sleep(1)
-                            self.driver.back()
-                    except  Exception  as e:
-                        Logger.println(f"【nick_name_element.click.e={e}】")
-                        pass
-
                 if md5_ in md5_contents:
                     continue
+                wx_number = ""
+                # phone = self.get_phone(b_e_content)
+                # nick_name_element = self.getNickNameElement(item)
+                # if nick_name_element:
+                #     try:
+                #         nick_name_element.click()
+                #         sleep(1)
+                #         by_xpath_nickname = self.find_element_by_xpath("//*[contains(@text,'昵称:')]")
+                #         if by_xpath_nickname:
+                #             nickName = by_xpath_nickname.get_attribute("text").replace('昵称:',
+                #                                                                        '').strip()
+                #         by_xpath = self.find_element_by_xpath("//*[contains(@text,'微信号:')]")
+                #         if by_xpath:
+                #             wx_number = by_xpath.get_attribute("text").replace('微信号:', '').strip()
+                #             Logger.println(f"【微信号={wx_number}】")
+                #             xpath = self.find_element_by_xpath("//*[contains(@text,'电话号码')]")
+                #             if xpath:
+                #                 phone_parent = xpath.parent
+                #                 phone = self.getPhone(phone_parent)
+                #                 Logger.println(f"【phone={phone}】")
+                #                 sleep(1)
+                #             self.driver.back()
+                #     except  Exception  as e:
+                #         Logger.println(f"【nick_name_element.click.e={e}】")
+                #         pass
                 image0 = self.find_element_by_xpath(
                     "//*[@content-desc='图片']", item)
                 if image0:
@@ -167,20 +177,21 @@ class Moments(MomentsBase):
                                 contents.append(data)
                                 self.driver.back()
                                 break
-                            md5_contents.append(md5_)
                             sleep(1)
                             self.swipeLeft()
+                        md5_contents.append(md5_)
                 date = time_util.now_to_date('%Y%m%d')
                 full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                      date + "wx_pic_moments.xls")
                 excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
                 index += 1
+                md5 = None
                 if len(md5_contents) > 1:
                     md5 = ','.join(md5_contents[0:2])
-                else:
+                elif len(md5_contents) > 0:
                     md5 = md5_contents[0]
-                self.config.set_value("wx_content", "md5_pic", md5)
-
+                if md5:
+                    self.config.set_value("wx_content", "md5_pic", md5)
 
     def main(self):
         """

@@ -86,6 +86,11 @@ class Moments(MomentsBase):
                     send_btn.click()
                     self.config.set_value("wx_content", "add_friend_last_phone", phone)
                     sleep(get_sleep(1, 2))
+                    send_btn = self.find_element_by_xpath(
+                        "//android.widget.Button[contains(@text,'发送')]")
+                    if send_btn:
+                        self.driver.back()
+                        sleep(get_sleep(1, 2))
                     self.driver.back()
                 else:
                     Logger.println(f"【main(号码已添加无需添加={phone}】")
@@ -135,11 +140,14 @@ class Moments(MomentsBase):
                 sleeptime = self.addfriend_inte_seconds
                 Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={count}个任务】")
                 while True:
-                    rdsleep = get_sleep(5, 6)
+                    rdsleep = get_sleep(5, 9)
+                    by_id = self.find_element_by_id('com.tencent.mm:id/bhn')
                     if rdsleep == 5:
-                        self.swipe_down()
+                        if by_id:
+                            by_id.send_keys(f'已经休眠{int(time()) - start_time}s')
                     else:
-                        self.swipe_up()
+                        if by_id:
+                            by_id.send_keys('')
                     sleep(rdsleep)
                     if int(time()) - start_time > sleeptime:
                         break
