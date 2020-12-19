@@ -166,6 +166,7 @@ class MomentsBase():
         # 滑屏，大概从屏幕右边2分之一高度，往左侧滑动,滑动后显示的是 热点tab
         self.driver.swipe(6 / 7 * x, 1 / 2 * y, 1 / 7 * x, 1 / 2 * y, 300)
 
+
     def find_element_by_id(self, id, driver=None):
         driver = driver or self.driver
         try:

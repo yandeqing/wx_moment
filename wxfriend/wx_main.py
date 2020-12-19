@@ -46,26 +46,46 @@ class Moments(MomentsBase):
         爬取
         :return:
         """
-        i = 0
+        index = 0
         contents = []
+        finished=False
         md5_contents = []
         while True:
             if wx_stop.stopFlag:
                 break
-            if i > 0:
+            if index > 0:
                 # 上滑
                 self.swipe_up()
                 sleep(3)
             items = self.find_elements_by_id("com.tencent.mm:id/fn9")
             if items is None:
                 continue
+            if finished:
+                break
             for item in items:
-                b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
+                b_e_content = None
+                content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
+                if content_element:
+                    content_element.click()
+                    sleep(2)
+                    b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
+                    Logger.println(f"【获取到全文内容={b_e_content}】")
+                    self.driver.back()
                 if b_e_content is None:
+                    b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
+                if b_e_content is None:
+                    if index == 0:
+                        index = +1
+                    Logger.println(f"【该条说说没有文本,忽略】")
+                    continue
+                image0 = self.find_element_by_xpath(
+                    "//*[@content-desc='图片']", item)
+                if image0 is None:
+                    Logger.println(f"【该条说说没有图片{b_e_content},忽略】")
                     continue
                 nickName = self.getNickName(item)
                 md5_ = self.MD5(b_e_content)
-                phone = self.get_phone(b_e_content)
+                phone = self.get_phone_from_txt(b_e_content)
                 data = {
                     'content_md5': md5_,
                     'nick_name': nickName,
@@ -74,30 +94,35 @@ class Moments(MomentsBase):
                     'file_ids': '',
                 }
                 if md5_ in self.wx_content_md5:
-                    Logger.println(f"【crawl{i}已经抓取到上一次位置({md5_}).data={data}】")
+                    Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={data}】")
+                    md5 = None
                     if len(md5_contents) > 1:
                         md5 = ','.join(md5_contents[0:2])
-                    else:
+                    elif len(md5_contents) > 0:
                         md5 = md5_contents[0]
-                    self.config.set_value("wx_content", "md5", md5)
+                    if md5:
+                        self.config.set_value("wx_content", "md5", md5)
+                    finished=True
                     break
                 if md5_ in md5_contents:
                     continue
                 else:
                     md5_contents.append(md5_)
-                    Logger.println(f"【crawl({i}).data={data}】")
+                    Logger.println(f"【crawl({index}).data={data}】")
                     contents.append(data)
-                    i = i + 1
-                if i % 5 == 0:
+                    index = index + 1
+                if index % 5 == 0:
                     date = time_util.now_to_date('%Y%m%d_%H')
                     full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                          date + "wx_moments.xls")
                     excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
+                    md5 = None
                     if len(md5_contents) > 1:
                         md5 = ','.join(md5_contents[0:2])
-                    else:
+                    elif len(md5_contents) > 0:
                         md5 = md5_contents[0]
-                    self.config.set_value("wx_content", "md5", md5)
+                    if md5:
+                        self.config.set_value("wx_content", "md5", md5)
 
     def main(self):
         """

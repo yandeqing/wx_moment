@@ -50,7 +50,7 @@ class Moments(MomentsBase):
         md5_contents = []
         contents = []
         last_base_md5 = None
-        finished=False
+        finished = False
         while True:
             if wx_stop.stopFlag:
                 break
@@ -64,17 +64,27 @@ class Moments(MomentsBase):
             if finished:
                 break
             for item in items:
-                b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
+                b_e_content = None
+                content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
+                if content_element:
+                    content_element.click()
+                    sleep(2)
+                    b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
+                    Logger.println(f"【获取到全文内容={b_e_content}】")
+                    if b_e_content:
+                        self.driver.back()
                 if b_e_content is None:
-                    content_element = self.getContentTextById("com.tencent.mm:id/b_m", item)
-                    if content_element:
-                        content_element.click()
-                        sleep(2)
-                        b_e_content = self.getContentTextById('com.tencent.mm:id/fpu', item)
-                    else:
-                        if index == 0:
-                            index = +1
-                        continue
+                    b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
+                if b_e_content is None:
+                    if index == 0:
+                        index = +1
+                    Logger.println(f"【该条说说没有文本,忽略】")
+                    continue
+                image0 = self.find_element_by_xpath(
+                    "//*[@content-desc='图片']", item)
+                if image0 is None:
+                    Logger.println(f"【该条说说没有图片{b_e_content},忽略】")
+                    continue
                 nickName = self.getNickName(item)
                 phone = ""
                 md5_ = self.MD5(b_e_content)
@@ -87,7 +97,7 @@ class Moments(MomentsBase):
                         md5 = md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
-                    finished=True
+                    finished = True
                     break
                 if md5_ in md5_contents:
                     continue

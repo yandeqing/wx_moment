@@ -98,7 +98,13 @@ class Moments(MomentsBase):
                 attribute = by_id.get_attribute('text')
                 if attribute == phone:
                     Logger.println(f"【main({phone}备注已经是手机号无需修改】")
+                    self.driver.back()
+                    sleep(get_sleep(1, 1))
+                    self.driver.back()
+                    return False
                 else:
+                    self.driver.keyevent(123)
+                    by_id.clear()
                     by_id.send_keys(phone)
                 pass
             sleep(get_sleep(1, 2))
