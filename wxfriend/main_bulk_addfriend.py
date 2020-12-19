@@ -140,7 +140,7 @@ class Moments(MomentsBase):
                 sleeptime = self.addfriend_inte_seconds
                 Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={count}个任务】")
                 while True:
-                    rdsleep = get_sleep(5, 9)
+                    rdsleep = get_sleep(5, 6)
                     by_id = self.find_element_by_id('com.tencent.mm:id/bhn')
                     if rdsleep == 5:
                         if by_id:

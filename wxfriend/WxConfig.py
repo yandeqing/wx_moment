@@ -64,6 +64,17 @@ def setAppDownloadUrl(app_download_url):
     return phone_excel
 
 
+def getAppexeReplaceDir():
+    appexe_replace_dir = config.get_value('appiumConfig', 'appexe_replace_dir')
+    Logger.println(f"【appexe_replace_dir={appexe_replace_dir}】")
+    return appexe_replace_dir
+
+
+def setAppexeReplaceDir(appexe_replace_dir):
+    appexe_replace_dir = config.set_value('appiumConfig', 'appexe_replace_dir', appexe_replace_dir)
+    return appexe_replace_dir
+
+
 def setServerUrl(server_url):
     return config.set_value('appiumConfig', 'driver_server', server_url)
 

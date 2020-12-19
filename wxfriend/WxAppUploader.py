@@ -37,10 +37,12 @@ def upload_file(token, file):
 
 def download(signals: pyqtSignal = None):
     url = WxConfig.getAppDownloadUrl()
-    download_address = FilePathUtil.get_full_dir('dist', 'window_main.exe')
-    if os.path.exists(download_address):
-        os.remove(download_address)
-    downloadFile(download_address, url, signals)
+    localpath = WxConfig.getAppexeReplaceDir()
+    if localpath is None:
+        localpath = FilePathUtil.get_full_dir('dist', 'window_main.exe')
+    if os.path.exists(localpath):
+        os.remove(localpath)
+    downloadFile(localpath, url, signals)
     return FilePathUtil.get_full_dir('dist')
 
 
@@ -65,7 +67,7 @@ def downloadFile(name, url, signals: pyqtSignal = None):
         if chunk:
             f.write(chunk)
             count += len(chunk)
-            if time.time() - time1 >1:
+            if time.time() - time1 > 1:
                 p = count / length * 100
                 speed = (count - count_tmp) / 1024 / 1024 / 2
                 count_tmp = count

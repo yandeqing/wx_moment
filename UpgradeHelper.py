@@ -17,11 +17,19 @@ class UpgradeHelperDialog(QDialog):
         layout = QFormLayout()
         self.config = MonitorConfig()
 
+        self.updateBtn = QPushButton("替换目标文件:")
+        self.le1 = QLineEdit()
+        dir = WxConfig.getAppexeReplaceDir()
+        self.le1.setText(dir)
+        layout.addRow(self.updateBtn, self.le1)
+        self.updateBtn.clicked.connect(self.clickUpdateBtn)  # 当点击save按钮时，对话框将会消失，点击Cacel按钮时，则不会消失。
+
         self.label = QLabel("更新文件地址:")
         self.le2 = QLineEdit()
         url = WxConfig.getAppDownloadUrl()
         self.le2.setText(url)
         layout.addRow(self.label, self.le2)
+
         self.progressLabel = QLabel("已下载 0%")
         layout.addRow(self.progressLabel)
 
@@ -35,13 +43,26 @@ class UpgradeHelperDialog(QDialog):
         layout.addRow(self.buttonBox)
 
         self.setLayout(layout)
-        self.setWindowTitle("微信运营小工具升级")
+        self.setWindowTitle("万能升级小工具")
         self.setWindowIcon(QIcon('./logo.ico'))
         self.runthread = DownloadRunthread()
         self.runthread.signals.connect(self.call_backlog)
 
     def call_backlog(self, text):
         self.progressLabel.setText(f"{text}")
+
+    def clickUpdateBtn(self):
+        full_dir = FilePathUtil.get_full_dir("dist")
+        filepath = self.open_file(full_dir)
+        if filepath:
+            WxConfig.setAppexeReplaceDir(filepath)
+            self.le1.setText(filepath)
+
+    def open_file(self, dir):
+        fileName, fileType = QtWidgets.QFileDialog.getOpenFileName(self, "选取文件", dir,
+                                                                   "All Files(*);;Text Files(*.exe)")
+        print(fileName, fileType)
+        return fileName
 
     def save(self):
         self.runthread.start()
@@ -51,5 +72,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = UpgradeHelperDialog()
     win.show()
-    win.setMinimumSize(360, 100)
+    win.setMinimumSize(560, 100)
     sys.exit(app.exec_())
