@@ -69,19 +69,15 @@ class Moments(MomentsBase):
                     content_element.click()
                     sleep(2)
                     b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
-                    Logger.println(f"【获取到全文内容={b_e_content}】")
-                    self.driver.back()
+                    if  b_e_content:
+                        Logger.println(f"【获取到全文内容={b_e_content}】")
+                        self.driver.back()
                 if b_e_content is None:
                     b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
                 if b_e_content is None:
                     if index == 0:
                         index = +1
                     Logger.println(f"【该条说说没有文本,忽略】")
-                    continue
-                image0 = self.find_element_by_xpath(
-                    "//*[@content-desc='图片']", item)
-                if image0 is None:
-                    Logger.println(f"【该条说说没有图片{b_e_content},忽略】")
                     continue
                 nickName = self.getNickName(item)
                 md5_ = self.MD5(b_e_content)

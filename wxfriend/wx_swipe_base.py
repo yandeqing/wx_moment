@@ -125,8 +125,8 @@ class MomentsBase():
         try:
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
-            y1 = int(size[1] * 0.8)  # 起始y坐标
-            y2 = int(size[1] * 0.3)  # 终点y坐标
+            y1 = int(size[1] * 0.75)  # 起始y坐标
+            y2 = int(size[1] * 0.25)  # 终点y坐标
             self.driver.swipe(x1, y1, x1, y2, _time)
             return True
         except:
@@ -142,8 +142,8 @@ class MomentsBase():
         try:
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
-            y1 = int(size[1] * 0.8)  # 起始y坐标
-            y2 = int(size[1] * 0.3)  # 终点y坐标
+            y1 = int(size[1] * 0.75)  # 起始y坐标
+            y2 = int(size[1] * 0.25)  # 终点y坐标
             self.driver.swipe(x1, y2, x1, y1, _time)
             return True
         except:

@@ -54,6 +54,20 @@ class ConfigDialog(QDialog):
         self.le4.setText(phone_excel)
         layout.addRow(self.addbtn, self.le4)
 
+        self.label5 = QLabel("最新朋友圈图片md5值")
+        self.le5 = QLineEdit()
+        self.config = MonitorConfig()
+        md5_pic = self.config.get_value("wx_content", "md5_pic")
+        self.le5.setText(md5_pic)
+        layout.addRow(self.label5, self.le5)
+
+        self.label6 = QLabel("最新朋友圈文本md5值")
+        self.le6= QLineEdit()
+        self.config = MonitorConfig()
+        md5 = self.config.get_value("wx_content", "md5")
+        self.le6.setText(md5)
+        layout.addRow(self.label6, self.le6)
+
         self.cacelButton = QPushButton("重新检测")
         self.saveButton = QPushButton("保存")
         self.cacelButton.clicked.connect(self.reconnect)  # 当点击save按钮时，对话框将会消失，点击Cacel按钮时，则不会消失。
@@ -68,12 +82,21 @@ class ConfigDialog(QDialog):
         self.setWindowIcon(QIcon('./logo.ico'))
 
     def save(self):
+
         server_url = self.le2.text()
         WxConfig.setServerUrl(server_url)
+
         max = self.le3.text()
         WxConfig.set_friend_max_count(max)
+
         addfriend_inte_seconds = self.le31.text()
         WxConfig.set_get_addfriend_inte_seconds(addfriend_inte_seconds)
+
+        md5_pic = self.le5.text()
+        self.config.set_value("wx_content", "md5_pic", md5_pic)
+
+        md5 = self.le6.text()
+        self.config.set_value("wx_content", "md5", md5)
         self.close()
 
     def reconnect(self):

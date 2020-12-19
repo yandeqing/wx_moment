@@ -70,8 +70,8 @@ class Moments(MomentsBase):
                     content_element.click()
                     sleep(2)
                     b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
-                    Logger.println(f"【获取到全文内容={b_e_content}】")
                     if b_e_content:
+                        Logger.println(f"【获取到全文内容={b_e_content}】")
                         self.driver.back()
                 if b_e_content is None:
                     b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
@@ -79,11 +79,6 @@ class Moments(MomentsBase):
                     if index == 0:
                         index = +1
                     Logger.println(f"【该条说说没有文本,忽略】")
-                    continue
-                image0 = self.find_element_by_xpath(
-                    "//*[@content-desc='图片']", item)
-                if image0 is None:
-                    Logger.println(f"【该条说说没有图片{b_e_content},忽略】")
                     continue
                 nickName = self.getNickName(item)
                 phone = ""
@@ -170,7 +165,8 @@ class Moments(MomentsBase):
                             name = f'mmexport{time}.jpg'
                             Logger.println(f"【crawl({index}.{index_img}).已保存图片={name}】")
                             last_base_md5 = base_md5
-                            if index_img == 8:
+                            is_oppo = self.desired_caps['deviceName'] == '5e8caad5'
+                            if index_img == 8 or is_oppo:
                                 sleep(1)
                                 end = FilePathUtil.get_time()
                                 data = {
@@ -190,7 +186,7 @@ class Moments(MomentsBase):
                             sleep(1)
                             self.swipeLeft()
                         md5_contents.append(md5_)
-                date = time_util.now_to_date('%Y%m%d')
+                date = time_util.now_to_date('%Y%m%d_%H')
                 full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                      date + "wx_pic_moments.xls")
                 excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
