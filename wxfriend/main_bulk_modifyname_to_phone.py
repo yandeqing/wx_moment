@@ -155,7 +155,7 @@ class Moments(MomentsBase):
             if wx_stop.stopFlag:
                 break
             phone = str(int(item['手机']))
-            Logger.println(f"【main开始执行{start_index + count+ 1}.第{count}个任务】")
+            Logger.println(f"【main开始执行{start_index + count + 1}.第{count}个任务】")
             if self.max_count > 1 and count > 1 and (count % self.max_count) == 0:
                 start_time = int(time())
                 sleeptime = self.addfriend_inte_seconds

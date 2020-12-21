@@ -12,12 +12,14 @@ from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk
 
 class EventConst():
     MAIN_BULK_M_NAME = 0
-    MAIN_BULK_ADDFRIEND = 1
-    WX_MAIN = 2
-    WX_MAIN_PIC = 3
-    PICCLASSFY = 4
-    WX_UPLOADER = 5
-    WX_PICUPLOADER = 6
+    MAIN_BULK_ADDFRIEND = MAIN_BULK_M_NAME + 1
+    WX_MAIN = MAIN_BULK_ADDFRIEND + 1
+    WX_MAIN_PIC = WX_MAIN + 1
+    WX_EXPORT = WX_MAIN + 1
+    WX_PICCLASSFY = WX_EXPORT + 1
+    WX_UPLOADER = WX_PICCLASSFY + 1
+    WX_PICUPLOADER = WX_UPLOADER + 1
+
 
 class DownloadRunthread(QThread):
     signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
@@ -36,6 +38,7 @@ class DownloadRunthread(QThread):
         except Exception as e:
             Logger.println(f"【run().e={e}】")
 
+
 class StopRunthread(QThread):
     signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
 
@@ -47,7 +50,7 @@ class StopRunthread(QThread):
         Logger.init(self.signals)
         try:
             Logger.println(f"【run()开始停止】")
-            wx_stop.stopFlag=True
+            wx_stop.stopFlag = True
             Logger.println(f"【run()任务已经停止】")
         except Exception as e:
             Logger.println(f"【run().e={e}】")
@@ -69,7 +72,7 @@ class Runthread(QThread):
 
     def run(self):
         Logger.init(self.signals)
-        wx_stop.stopFlag=False
+        wx_stop.stopFlag = False
         try:
             if self.fuc_code == EventConst.MAIN_BULK_ADDFRIEND:
                 main_bulk_addfriend.Moments().main()
@@ -79,8 +82,10 @@ class Runthread(QThread):
                 wx_main.Moments().main()
             elif self.fuc_code == EventConst.WX_MAIN_PIC:
                 wx_main_pic.Moments().main()
-            elif self.fuc_code == EventConst.PICCLASSFY:
-                PicClassfyUtil.main()
+            elif self.fuc_code == EventConst.WX_EXPORT:
+                PicClassfyUtil.export()
+            elif self.fuc_code == EventConst.WX_PICCLASSFY:
+                PicClassfyUtil.classify(self.data)
             elif self.fuc_code == EventConst.WX_UPLOADER:
                 WxUploader.main(self.data)
             elif self.fuc_code == EventConst.WX_PICUPLOADER:

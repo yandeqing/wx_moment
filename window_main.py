@@ -105,6 +105,8 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_label_2.setObjectName('left_label')
         self.left_label_3 = QtWidgets.QPushButton("导出图片到电脑")
         self.left_label_3.setObjectName('left_label')
+        self.left_label_31 = QtWidgets.QPushButton("按文本内容对图片分组 ")
+        self.left_label_31.setObjectName('left_label')
         self.left_label_4 = QtWidgets.QPushButton("上传文本到后台")
         self.left_label_4.setObjectName('left_label')
         self.left_label_5 = QtWidgets.QPushButton("上传图片到后台")
@@ -118,9 +120,10 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_layout.addWidget(self.left_label_1, 2, 0, 1, 3)
         self.left_layout.addWidget(self.left_label_2, 3, 0, 1, 3)
         self.left_layout.addWidget(self.left_label_3, 4, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_4, 5, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_5, 6, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_6, 7, 0, 1, 3)
+        self.left_layout.addWidget(self.left_label_31, 5, 0, 1, 3)
+        self.left_layout.addWidget(self.left_label_4, 6, 0, 1, 3)
+        self.left_layout.addWidget(self.left_label_5, 7, 0, 1, 3)
+        self.left_layout.addWidget(self.left_label_6, 8, 0, 1, 3)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
                 padding:10px;
@@ -137,7 +140,8 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread01 = Runthread(EventConst.MAIN_BULK_M_NAME)
         self.runthread1 = Runthread(EventConst.WX_MAIN_PIC)
         self.runthread2 = Runthread(EventConst.WX_MAIN)
-        self.runthread3 = Runthread(EventConst.PICCLASSFY)
+        self.runthread3 = Runthread(EventConst.WX_EXPORT)
+        self.runthread31 = Runthread(EventConst.WX_PICCLASSFY)
         self.runthread4 = Runthread(EventConst.WX_UPLOADER)
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
         self.stopRunner = StopRunthread()
@@ -146,6 +150,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread1.signals.connect(self.call_backlog)
         self.runthread2.signals.connect(self.call_backlog)
         self.runthread3.signals.connect(self.call_backlog)
+        self.runthread31.signals.connect(self.call_backlog)
         self.runthread4.signals.connect(self.call_backlog)
         self.runthread5.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
@@ -155,6 +160,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_label_1.clicked.connect(self.clickLabel1)
         self.left_label_2.clicked.connect(self.clickLabel2)
         self.left_label_3.clicked.connect(self.clickLabel3)
+        self.left_label_31.clicked.connect(self.clickLabel31)
         self.left_label_4.clicked.connect(self.clickLabel4)
         self.left_label_5.clicked.connect(self.clickLabel5)
         self.left_label_6.clicked.connect(self.clickLabel6)
@@ -217,8 +223,20 @@ class MainUi(QtWidgets.QMainWindow):
     def clickLabel3(self):
         self.call_backlog("正在导出图片到电脑 ,请稍后...")
         try:
-            self.left_label_3.setEnabled(False)
             self.runthread3.start()
+        except Exception as e:
+            self.call_backlog(f"【clickLabel3().Exception={e}】")
+            pass
+
+    def clickLabel31(self):
+        self.call_backlog("正在按文本内容对图片分组 ,请稍后...")
+        try:
+            full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
+            filepath = self.open_file(full_dir)
+            if filepath:
+                self.call_backlog("正在按文本内容对图片分组 ,请稍后...")
+                self.runthread31.set_data(filepath)
+                self.runthread31.start()
         except Exception as e:
             self.call_backlog(f"【clickLabel3().Exception={e}】")
             pass
@@ -230,7 +248,7 @@ class MainUi(QtWidgets.QMainWindow):
         return fileName
 
     def clickLabel4(self):
-        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text")
+        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
         filepath = self.open_file(full_dir)
         if filepath:
             self.runthread4.set_data(filepath)

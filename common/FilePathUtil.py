@@ -23,7 +23,7 @@ def get_full_dir(path, *paths):
 
 def move_files_by_time(source, destination, start, end):
     if not os.path.exists(destination):
-        os.mkdir(destination)
+        os.makedirs(destination)
     files = []
     if os.path.isdir(source):
         lists = os.listdir(source)

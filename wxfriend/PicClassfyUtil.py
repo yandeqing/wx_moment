@@ -6,6 +6,7 @@
 '''
 
 import os
+import shutil
 import threading
 
 from common import FilePathUtil, excel_util, Logger
@@ -33,6 +34,9 @@ def stop_server():
 
 def export():
     full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic')
+    weixinPath = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
+    if os.path.exists(weixinPath):
+        shutil.rmtree(weixinPath)
     deviceId = WxConfig.getAppiumConfig()["deviceName"]
     if deviceId:
         exec_shell(f'pull /sdcard/Pictures/WeiXin/ {full_dir}', deviceId=deviceId)
@@ -40,13 +44,9 @@ def export():
         Logger.println(f"【().未找到设备】")
 
 
-def main():
-    # 1.手机导出微信相册
-    export()
+def classify(full_dir):
     # 2.excel获取朋友圈所有说说的md5以及图片的保存起始时间值
-    full_dir = FilePathUtil.get_lastmodify_file(
-        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    sheetname = os.path.basename(full_dir)[0:8]
+    sheetname = os.path.basename(full_dir)[0:11]
     Logger.println(f"【().full_dir={full_dir}】")
     Logger.println(f"【().file={sheetname}】")
     array = excel_util.excel2array(full_dir, sheetname)
@@ -61,6 +61,14 @@ def main():
         des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
         Logger.println(FilePathUtil.move_files_by_time(full_dir, des_dir, start, end))
     startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
+
+
+def main():
+    # 1.手机导出微信相册
+    export()
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    classify(full_dir)
 
 
 if __name__ == '__main__':

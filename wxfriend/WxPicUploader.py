@@ -35,21 +35,24 @@ def put_img(md5, file_ids):
             return True
         else:
             return False
-    except:
+    except Exception as e:
+        Logger.println(f"Exception is【{e}】")
         return False
 
 
 def files_token(type='image', count=1):
-    res = requests.get(f"http://internal.zuker.im/files/token?type={type}&count={count}")
-    res_json = res.json()
-    jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-    Logger.println(f"【files_token().jsonstr={jsonstr}】")
-    if res_json['code'] == 0:
-        return res_json['result']
-    else:
+    try:
+        res = requests.get(f"http://internal.zuker.im/files/token?type={type}&count={count}")
+        res_json = res.json()
+        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        Logger.println(f"【files_token().jsonstr={jsonstr}】")
+        if res_json['code'] == 0:
+            return res_json['result']
+        else:
+            return None
+    except Exception as e:
+        Logger.println(f"Exception is【{e}】")
         return None
-
-
 
 
 def upload_img(token, file):
@@ -75,20 +78,24 @@ def main(full_dir):
         if wx_stop.stopFlag:
             break
         content_md5 = item['content_md5']
+        count = int(item['count'])
         Logger.println(f"【().content_md5={content_md5}】")
         files = FilePathUtil.get_files_by_dir(
             FilePathUtil.get_full_dir("wxfriend", "pic", "WeiXinCopy", content_md5))
-        count = len(files)
         tokens = files_token(count=count)
-        img_ids = []
-        for index, file in enumerate(files):
-            img_id = upload_img(tokens[index], file)
-            img_ids.append(str(img_id))
-        join = ",".join(img_ids)
-        if join:
-            put_img(content_md5, join)
+        if tokens:
+            img_ids = []
+            for index, file in enumerate(files):
+                img_id = upload_img(tokens[index], file)
+                img_ids.append(str(img_id))
+            join = ",".join(img_ids)
+            if join:
+                put_img(content_md5, join)
+            else:
+                Logger.println(f"【content_md5={content_md5}没有对应的图片】")
         else:
-            Logger.println(f"【content_md5={content_md5}没有对应的图片】")
+            Logger.println(f"【token 生成失败】")
+    Logger.println(f"【共完成{len(array)}条朋友圈信息的图片文件上传】")
 
 
 if __name__ == '__main__':
