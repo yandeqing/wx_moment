@@ -34,6 +34,14 @@ class MainUi(QtWidgets.QMainWindow):
     def openPicDir(self):
         startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
+    def exportPhone(self):
+        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel")
+        filepath = self.open_file(full_dir)
+        if filepath:
+            self.call_backlog("正在提取电话号码 ,请稍后...")
+            self.runthread6.set_data(filepath)
+            self.runthread6.start()
+
     def download(self):
         startfile(FilePathUtil.get_full_dir('dist', 'UpgradeHelper.exe'))
         self.close()
@@ -62,6 +70,10 @@ class MainUi(QtWidgets.QMainWindow):
         downloadAction.setStatusTip('下载最新版本')
         downloadAction.triggered.connect(self.download)
 
+        exportAction = QAction(QIcon('exit.png'), '从"描述"字段中提取手机号', self)
+        exportAction.setStatusTip('从"描述"字段中提取手机号')
+        exportAction.triggered.connect(self.exportPhone)
+
         # 底部状态栏
         self.statusBar().showMessage('状态栏')
 
@@ -70,6 +82,8 @@ class MainUi(QtWidgets.QMainWindow):
         menubar.setNativeMenuBar(False)
         fileMenu = menubar.addMenu('配置')
         fileMenu.addAction(configAction)
+        exMenu = menubar.addMenu('提取手机号')
+        exMenu.addAction(exportAction)
         picMenu = menubar.addMenu('打开图片文件夹')
         picMenu.addAction(picAction)
         downloadMenu = menubar.addMenu('版本更新')
@@ -144,6 +158,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread31 = Runthread(EventConst.WX_PICCLASSFY)
         self.runthread4 = Runthread(EventConst.WX_UPLOADER)
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
+        self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
         self.stopRunner = StopRunthread()
         self.runthread0.signals.connect(self.call_backlog)
         self.runthread01.signals.connect(self.call_backlog)
@@ -153,6 +168,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread31.signals.connect(self.call_backlog)
         self.runthread4.signals.connect(self.call_backlog)
         self.runthread5.signals.connect(self.call_backlog)
+        self.runthread6.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
 
         self.left_label_0.clicked.connect(self.clickLabel0)

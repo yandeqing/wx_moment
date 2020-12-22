@@ -19,20 +19,28 @@ def main_backgroud():
     thread = threading.Thread(target=main)
     thread.start()
 
+
 def main(full_dir):
-    sheetname = os.path.basename(full_dir)[0:11]
     Logger.println(f"【().full_dir={full_dir}】")
-    Logger.println(f"【().file={sheetname}】")
-    array = excel_util.excel2array(full_dir, sheetname)
+    array = excel_util.excel2array(full_dir)
     array = array[::-1]
     count = 0
-    for index, item in enumerate(array):
-        if wx_stop.stopFlag:
-            break
-        Logger.println(f"【({index}).item={item}】")
-        res = requests.post("http://internal.zuker.im/moment", json=item)
-        jsonstr =json.dumps(res.json(),indent=4,ensure_ascii=False)
-        Logger.println(f"【({index}).res={jsonstr}】")
+    uploadItems(array)
+
+
+def uploadItems(array):
+    try:
+        for index, item in enumerate(array):
+            if wx_stop.stopFlag:
+                break
+            Logger.println(f"【({index}).item={item}】")
+            res = requests.post("http://internal.zuker.im/moment", json=item)
+            jsonstr = json.dumps(res.json(), indent=4, ensure_ascii=False)
+            Logger.println(f"【({index}).res={jsonstr}】")
+    except Exception as e:
+        Logger.println(f"【e={e}】")
+        pass
+
 
 if __name__ == '__main__':
     full_dir = FilePathUtil.get_lastmodify_file(

@@ -12,7 +12,7 @@ from appium.webdriver.common.touch_action import TouchAction
 
 from common import FilePathUtil, time_util, excel_util, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend import wx_stop
+from wxfriend import wx_stop, WxUploader
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -42,6 +42,7 @@ class Moments(MomentsBase):
         el3.click()
 
     def crawl(self):
+        self.enter()
         """
         爬取
         :return:
@@ -81,7 +82,7 @@ class Moments(MomentsBase):
                     Logger.println(f"【该条说说没有文本,忽略】")
                     continue
                 nickName = self.getNickName(item)
-                phone = ""
+                phone = self.get_phone_from_txt(b_e_content)
                 md5_ = self.MD5(b_e_content)
                 if md5_ in self.wx_content_md5:
                     Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
@@ -93,6 +94,10 @@ class Moments(MomentsBase):
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
                     finished = True
+                    self.driver.back()
+                    # 延迟一段时间
+                    sleep(self.get_sleep(15, 20))
+                    self.crawl()
                     break
                 if md5_ in md5_contents:
                     continue
@@ -192,7 +197,12 @@ class Moments(MomentsBase):
                 date = time_util.now_to_date('%Y%m%d_%H')
                 full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                      date + "wx_pic_moments.xls")
-                excel_util.write_excel(filename=full_dir, worksheet_name=date, items=contents)
+                excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
+                                              items=contents)
+                value = self.config.get_value("wx_content", "select")
+                if value == 'True':
+                    WxUploader.uploadItems(contents)
+                contents.clear()
                 index += 1
                 md5 = None
                 if len(md5_contents) > 1:
@@ -207,8 +217,6 @@ class Moments(MomentsBase):
         入口
         :return:
         """
-        # 进入朋友圈
-        self.enter()
         # 爬取
         self.crawl()
 

@@ -46,10 +46,8 @@ def export():
 
 def classify(full_dir):
     # 2.excel获取朋友圈所有说说的md5以及图片的保存起始时间值
-    sheetname = os.path.basename(full_dir)[0:11]
     Logger.println(f"【().full_dir={full_dir}】")
-    Logger.println(f"【().file={sheetname}】")
-    array = excel_util.excel2array(full_dir, sheetname)
+    array = excel_util.excel2array(full_dir)
     count = 0
     for index, item in enumerate(array):
         content_md5 = item['content_md5']

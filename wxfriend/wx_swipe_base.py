@@ -28,7 +28,14 @@ class MomentsBase():
         except:
             pass
 
+    def get_sleep(self, start: int = 1, end: int = 9):
+        import random
+        randint = random.randint(start, end)
+        self.total_count += randint
+        return randint
+
     def __init__(self):
+        self.total_count = 0
         self.desired_caps = WxConfig.getAppiumConfig()
         self.driver = webdriver.Remote(WxConfig.getServerUrl(), self.desired_caps)
         self.wait = WebDriverWait(self.driver, TIMEOUT)
@@ -71,7 +78,7 @@ class MomentsBase():
             pass
 
     def get_phone_from_txt(self, text):
-        phone_reg = re.compile("([0-9]{2,4}[-.\s]{,1}){5}", re.MULTILINE)
+        phone_reg = re.compile('[0-9]{11}', re.MULTILINE)
         search = phone_reg.search(text)
         if search and search.group:
             return search.group(0).strip()
@@ -165,7 +172,6 @@ class MomentsBase():
         y = size[1]
         # 滑屏，大概从屏幕右边2分之一高度，往左侧滑动,滑动后显示的是 热点tab
         self.driver.swipe(6 / 7 * x, 1 / 2 * y, 1 / 7 * x, 1 / 2 * y, 300)
-
 
     def find_element_by_id(self, id, driver=None):
         driver = driver or self.driver

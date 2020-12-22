@@ -5,7 +5,7 @@ from threading import Thread
 # 继承QThread
 from PyQt5.QtCore import pyqtSignal, QThread
 
-from common import Logger
+from common import Logger, excel_util
 from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk_addfriend, \
     WxPicUploader, main_bulk_modifyname_to_phone, wx_stop
 
@@ -19,6 +19,7 @@ class EventConst():
     WX_PICCLASSFY = WX_EXPORT + 1
     WX_UPLOADER = WX_PICCLASSFY + 1
     WX_PICUPLOADER = WX_UPLOADER + 1
+    WX_EXPORT_PHONE = WX_PICUPLOADER + 1
 
 
 class DownloadRunthread(QThread):
@@ -90,6 +91,8 @@ class Runthread(QThread):
                 WxUploader.main(self.data)
             elif self.fuc_code == EventConst.WX_PICUPLOADER:
                 WxPicUploader.main(self.data)
+            elif self.fuc_code == EventConst.WX_EXPORT_PHONE:
+                excel_util.exportPhone(self.data)
             else:
                 Logger.println(f'没有响应事件={self.fuc_code}')
         except Exception as e:

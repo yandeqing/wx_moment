@@ -70,10 +70,8 @@ def main_backgroud():
 
 
 def main(full_dir):
-    sheetname = os.path.basename(full_dir)[0:11]
     Logger.println(f"【().excel={full_dir}】")
-    Logger.println(f"【().sheetname={sheetname}】")
-    array = excel_util.excel2array(full_dir, sheetname)
+    array = excel_util.excel2array(full_dir)
     for index, item in enumerate(array):
         if wx_stop.stopFlag:
             break

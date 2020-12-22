@@ -30,16 +30,16 @@ class Moments(MomentsBase):
         self.last_record_phone = self.config.get_value("wx_content", "add_friend_last_phone")
 
     def add(self, phone):
-        sleep(get_sleep(6, 8))
+        sleep(self.get_sleep(6, 8))
         # 输入电话号码
         try:
             self.find_element_by_id('com.tencent.mm:id/bhn').send_keys(phone)
         except:
             pass
-        sleep(get_sleep(5, 8))
+        sleep(self.get_sleep(5, 8))
         try:
             self.find_element_by_id('com.tencent.mm:id/f8g').click()
-            sleep(get_sleep(4, 6))
+            sleep(self.get_sleep(4, 6))
         except:
             pass
 
@@ -51,7 +51,7 @@ class Moments(MomentsBase):
                 self.find_element_by_xpath(
                     "//android.widget.Button[contains(@text,'确定')]").click()
                 self.config.set_value("wx_content", "add_friend_last_phone", phone)
-                sleep(get_sleep(1, 2))
+                sleep(self.get_sleep(1, 2))
                 return False
             xpath = self.find_element_by_xpath(
                 "//android.widget.TextView[contains(@text,'被搜账号状态异常')]")
@@ -60,7 +60,7 @@ class Moments(MomentsBase):
                 self.find_element_by_xpath(
                     "//android.widget.Button[contains(@text,'确定')]").click()
                 self.config.set_value("wx_content", "add_friend_last_phone", phone)
-                sleep(get_sleep(1, 2))
+                sleep(self.get_sleep(1, 2))
                 return False
             else:
                 xpath = self.find_element_by_xpath(
@@ -79,18 +79,18 @@ class Moments(MomentsBase):
                 "//android.widget.TextView[contains(@text,'添加到通讯录')]")
             if addbtn:
                 addbtn.click()
-                sleep(get_sleep(5, 6))
+                sleep(self.get_sleep(5, 6))
                 send_btn = self.find_element_by_xpath(
                     "//android.widget.Button[contains(@text,'发送')]")
                 if send_btn:
                     send_btn.click()
                     self.config.set_value("wx_content", "add_friend_last_phone", phone)
-                    sleep(get_sleep(1, 2))
+                    sleep(self.get_sleep(1, 2))
                     send_btn = self.find_element_by_xpath(
                         "//android.widget.Button[contains(@text,'发送')]")
                     if send_btn:
                         self.driver.back()
-                        sleep(get_sleep(1, 2))
+                        sleep(self.get_sleep(1, 2))
                     self.driver.back()
                 else:
                     Logger.println(f"【main(号码已添加无需添加={phone}】")
@@ -103,16 +103,16 @@ class Moments(MomentsBase):
             pass
 
     def main(self):
-        sleep(get_sleep(6, 10))
+        sleep(self.get_sleep(6, 10))
         # 点击搜索按钮
         self.find_element_by_id('com.tencent.mm:id/f8y').click()
-        sleep(get_sleep(3, 5))
+        sleep(self.get_sleep(3, 5))
         # full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "手机号列表.xls")
         full_dir = WxConfig.getPhoneExcel()
         if not full_dir:
             Logger.println(f"【main(请先配置手机号列表文件】")
             return
-        array = excel_util.excel2array(full_dir, "手机号列表")
+        array = excel_util.excel2array(full_dir)
         length = len(array)
         if not array:
             Logger.println(f"【main(请先配置手机号列表文件的sheet_name为手机号列表】")
@@ -140,7 +140,7 @@ class Moments(MomentsBase):
                 sleeptime = self.addfriend_inte_seconds
                 Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={count}个任务】")
                 while True:
-                    rdsleep = get_sleep(5, 6)
+                    rdsleep = self.get_sleep(5, 6)
                     by_id = self.find_element_by_id('com.tencent.mm:id/bhn')
                     if rdsleep == 5:
                         if by_id:
@@ -157,7 +157,7 @@ class Moments(MomentsBase):
             if self.add(phone):
                 break
             count += 1
-            Logger.println(f"【main(花费时间).total_count={total_count}s】")
+            Logger.println(f"【main(花费时间).total_count={self.total_count}s】")
         # self.add('13120749104')
 
     def main_backgroud(self):
@@ -165,15 +165,8 @@ class Moments(MomentsBase):
         thread.start()
 
 
-total_count = 0
 
 
-def get_sleep(start: int = 1, end: int = 9):
-    global total_count
-    import random
-    randint = random.randint(start, end)
-    total_count += randint
-    return randint
 
 
 if __name__ == '__main__':

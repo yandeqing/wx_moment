@@ -2,10 +2,10 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QDialog, QDialogButtonBox, \
-    QApplication
+    QApplication, QCheckBox
 from qtpy import QtCore, QtWidgets
 
-from common import FilePathUtil
+from common import FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
 from wxfriend import WxConfig
 
@@ -62,11 +62,22 @@ class ConfigDialog(QDialog):
         layout.addRow(self.label5, self.le5)
 
         self.label6 = QLabel("最新朋友圈文本md5值")
-        self.le6= QLineEdit()
+        self.le6 = QLineEdit()
         self.config = MonitorConfig()
         md5 = self.config.get_value("wx_content", "md5")
         self.le6.setText(md5)
         layout.addRow(self.label6, self.le6)
+
+        self.label7 = QLabel("抓取文本时同时同步到云端")
+        self.select_checkbox = QCheckBox("")
+        value = self.config.get_value("wx_content", "select")
+        if value=='True':
+            self.select_checkbox.setChecked(True)
+        else:
+            self.select_checkbox.setChecked(False)
+        # self.select_checkbox.stateChanged.connect(self.onQCheckBoxChange)
+
+        layout.addRow(self.label7, self.select_checkbox)
 
         self.cacelButton = QPushButton("重新检测")
         self.saveButton = QPushButton("保存")
@@ -81,8 +92,8 @@ class ConfigDialog(QDialog):
         self.setWindowTitle("配置服务器地址")
         self.setWindowIcon(QIcon('./logo.ico'))
 
-    def save(self):
 
+    def save(self):
         server_url = self.le2.text()
         WxConfig.setServerUrl(server_url)
 
@@ -97,6 +108,9 @@ class ConfigDialog(QDialog):
 
         md5 = self.le6.text()
         self.config.set_value("wx_content", "md5", md5)
+
+        select = self.select_checkbox.isChecked()
+        self.config.set_value("wx_content", "select", str(select))
         self.close()
 
     def reconnect(self):
