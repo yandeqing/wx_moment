@@ -13,6 +13,7 @@ import requests
 from qiniu import put_file
 
 from common import FilePathUtil, excel_util, time_util, Logger
+from config.AppConfig import MonitorConfig
 from wxfriend import wx_stop
 
 
@@ -70,29 +71,55 @@ def main_backgroud():
 
 
 def main(full_dir):
+    config = MonitorConfig()
+    error_md5_pic = config.get_value("wx_content", "error_md5_pic")
     Logger.println(f"【().excel={full_dir}】")
     array = excel_util.excel2array(full_dir)
-    for index, item in enumerate(array):
+    # 错误
+    start_index = 0
+    length = len(array)
+
+    if error_md5_pic:
+        for index, item in enumerate(array):
+            content_md5 = item['content_md5']
+            if error_md5_pic == content_md5:
+                start_index = index
+                Logger.println(f"【找到上次异常的位置={start_index}={error_md5_pic}】")
+                break
+
+    if start_index + 1 > length:
+        Logger.println(f"【已经是最后一条了】")
+        return
+
+    for index, item in enumerate(array[start_index:length]):
         if wx_stop.stopFlag:
             break
         content_md5 = item['content_md5']
         count = int(item['count'])
         Logger.println(f"【().content_md5={content_md5}】")
-        files = FilePathUtil.get_files_by_dir(
-            FilePathUtil.get_full_dir("wxfriend", "pic", "WeiXinCopy", content_md5))
-        tokens = files_token(count=count)
-        if tokens:
-            img_ids = []
-            for index, file in enumerate(files):
-                img_id = upload_img(tokens[index], file)
-                img_ids.append(str(img_id))
-            join = ",".join(img_ids)
-            if join:
-                put_img(content_md5, join)
+        try:
+            files = FilePathUtil.get_files_by_dir(
+                FilePathUtil.get_full_dir("wxfriend", "pic", "WeiXinCopy", content_md5))
+            tokens = files_token(count=count)
+            if tokens:
+                img_ids = []
+                for index, file in enumerate(files):
+                    if index > count - 1:
+                        Logger.println(f"【content_md5={content_md5}图片出现重复】")
+                        break
+                    img_id = upload_img(tokens[index], file)
+                    img_ids.append(str(img_id))
+                join = ",".join(img_ids)
+                if join:
+                    put_img(content_md5, join)
+                else:
+                    Logger.println(f"【content_md5={content_md5}没有对应的图片】")
             else:
-                Logger.println(f"【content_md5={content_md5}没有对应的图片】")
-        else:
-            Logger.println(f"【token 生成失败】")
+                Logger.println(f"【token 生成失败】")
+        except Exception as e:
+            Logger.println(f"【{content_md5} 图片上传失败!{e}】")
+            config.set_value("wx_content", "error_md5_pic", content_md5)
+            break
     Logger.println(f"【共完成{len(array)}条朋友圈信息的图片文件上传】")
 
 

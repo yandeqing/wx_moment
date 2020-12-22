@@ -5,12 +5,12 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QInputDialog, qApp
+from PyQt5.QtWidgets import QAction
 
 from ConfigBox import ConfigDialog
 from common import Logger, FilePathUtil
 from common.FilePathUtil import startfile
-from wxfriend import WxConfig, WxAppUploader
+from wxfriend import WxConfig
 from wxfriend.window_main_function_manager import Runthread, EventConst, StopRunthread
 
 
@@ -109,35 +109,45 @@ class MainUi(QtWidgets.QMainWindow):
         self.main_layout.addWidget(self.right_widget, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
         self.setCentralWidget(self.main_widget)  # 设置窗口主部件
 
-        self.left_label_0 = QtWidgets.QPushButton("批量添加好友")
-        self.left_label_0.setObjectName('left_label')
-        self.left_label_01 = QtWidgets.QPushButton("批量修改备注为手机号")
-        self.left_label_01.setObjectName('left_label')
-        self.left_label_1 = QtWidgets.QPushButton("导出有图片的文本朋友圈信息")
-        self.left_label_1.setObjectName('left_label')
-        self.left_label_2 = QtWidgets.QPushButton("导出文本朋友圈信息")
-        self.left_label_2.setObjectName('left_label')
-        self.left_label_3 = QtWidgets.QPushButton("导出图片到电脑")
-        self.left_label_3.setObjectName('left_label')
-        self.left_label_31 = QtWidgets.QPushButton("按文本内容对图片分组 ")
-        self.left_label_31.setObjectName('left_label')
-        self.left_label_4 = QtWidgets.QPushButton("上传文本到后台")
-        self.left_label_4.setObjectName('left_label')
-        self.left_label_5 = QtWidgets.QPushButton("上传图片到后台")
-        self.left_label_5.setObjectName('left_label')
+        models = [{'label': '导出微信通讯录', 'objName': 'left_label'},
+                  {'label': '批量添加好友', 'objName': 'left_label'},
+                  {'label': '批量修改备注为手机号', 'objName': 'left_label'},
+                  {'label': '导出有图片的文本朋友圈信息', 'objName': 'left_label'},
+                  {'label': '导出含文本朋友圈信息', 'objName': 'left_label'},
+                  {'label': '导出图片到电脑', 'objName': 'left_label'},
+                  {'label': '按文本内容对图片分组', 'objName': 'left_label'},
+                  {'label': '上传文本到后台', 'objName': 'left_label'},
+                  {'label': '上传图片到后台', 'objName': 'left_label'},
+                  {'label': '停止任务', 'objName': 'left_label'}]
 
-        self.left_label_6 = QtWidgets.QPushButton("停止任务")
-        self.left_label_6.setObjectName('left_label')
+        self.buttons = []
+        for index, model in enumerate(models):
+            btn = QtWidgets.QPushButton(model['label'])
+            btn.setObjectName(model['objName'])
+            self.buttons.append(btn)
 
-        self.left_layout.addWidget(self.left_label_0, 0, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_01, 1, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_1, 2, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_2, 3, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_3, 4, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_31, 5, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_4, 6, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_5, 7, 0, 1, 3)
-        self.left_layout.addWidget(self.left_label_6, 8, 0, 1, 3)
+        for index, btn in enumerate(self.buttons):
+            self.left_layout.addWidget(btn, index, 0, 1, 3)
+            if index == 0:
+                btn.clicked.connect(self.clickGetContacts)
+            elif index == 1:
+                btn.clicked.connect(self.clickAddFriend)
+            elif index == 2:
+                btn.clicked.connect(self.clickModifyName)
+            elif index == 3:
+                btn.clicked.connect(self.clickTextWithPicMoment)
+            elif index == 4:
+                btn.clicked.connect(self.clickTextMoment)
+            elif index == 5:
+                btn.clicked.connect(self.clickExportPic)
+            elif index == 6:
+                btn.clicked.connect(self.clickPicClassfy)
+            elif index == 7:
+                btn.clicked.connect(self.clickUploadText)
+            elif index == 8:
+                btn.clicked.connect(self.clickUploadPic)
+            elif index == 9:
+                btn.clicked.connect(self.clickStopLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
                 padding:10px;
@@ -150,6 +160,7 @@ class MainUi(QtWidgets.QMainWindow):
             }
         ''')
 
+        self.runthread = Runthread(EventConst.WX_CONTACT)
         self.runthread0 = Runthread(EventConst.MAIN_BULK_ADDFRIEND)
         self.runthread01 = Runthread(EventConst.MAIN_BULK_M_NAME)
         self.runthread1 = Runthread(EventConst.WX_MAIN_PIC)
@@ -160,6 +171,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
         self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
         self.stopRunner = StopRunthread()
+        self.runthread.signals.connect(self.call_backlog)
         self.runthread0.signals.connect(self.call_backlog)
         self.runthread01.signals.connect(self.call_backlog)
         self.runthread1.signals.connect(self.call_backlog)
@@ -170,16 +182,6 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5.signals.connect(self.call_backlog)
         self.runthread6.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
-
-        self.left_label_0.clicked.connect(self.clickLabel0)
-        self.left_label_01.clicked.connect(self.clickLabel01)
-        self.left_label_1.clicked.connect(self.clickLabel1)
-        self.left_label_2.clicked.connect(self.clickLabel2)
-        self.left_label_3.clicked.connect(self.clickLabel3)
-        self.left_label_31.clicked.connect(self.clickLabel31)
-        self.left_label_4.clicked.connect(self.clickLabel4)
-        self.left_label_5.clicked.connect(self.clickLabel5)
-        self.left_label_6.clicked.connect(self.clickLabel6)
 
         self.right_label = QtWidgets.QTextEdit("")
         self.right_label.setPlaceholderText("日志输出区")
@@ -200,62 +202,43 @@ class MainUi(QtWidgets.QMainWindow):
     def call_backlog(self, text):
         self.right_label.append(f"{text}")
 
-    def clickLabel0(self):
+    def clickGetContacts(self):
+        self.buttons[0].setEnabled(False)
+        self.call_backlog("正在获取通讯录,请稍后...")
+        self.runthread.start()
+
+    def clickAddFriend(self):
+        self.buttons[1].setEnabled(False)
         self.call_backlog("正在批量添加好友,请稍后...")
-        try:
-            self.left_label_0.setEnabled(False)
-            self.runthread0.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel0().Exception={e}】")
-            pass
+        self.runthread0.start()
 
-    def clickLabel01(self):
+    def clickModifyName(self):
+        self.buttons[2].setEnabled(False)
         self.call_backlog("正在批量修改备注,请稍后...")
-        try:
-            self.left_label_01.setEnabled(False)
-            self.runthread01.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel0().Exception={e}】")
-            pass
+        self.runthread01.start()
 
-    def clickLabel1(self):
+    def clickTextWithPicMoment(self):
         self.call_backlog("正在导出有图片的文本朋友圈信息,请稍后...")
-        try:
-            self.left_label_1.setEnabled(False)
-            self.runthread1.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel1().Exception={e}】")
-            pass
+        self.buttons[3].setEnabled(False)
+        self.runthread1.start()
 
-    def clickLabel2(self):
+    def clickTextMoment(self):
+        self.buttons[4].setEnabled(False)
         self.call_backlog("导出文本朋友圈信息,请稍后...")
-        try:
-            self.left_label_2.setEnabled(False)
-            self.runthread2.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel2().Exception={e}】")
-            pass
+        self.runthread2.start()
 
-    def clickLabel3(self):
+    def clickExportPic(self):
         self.call_backlog("正在导出图片到电脑 ,请稍后...")
-        try:
-            self.runthread3.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel3().Exception={e}】")
-            pass
+        self.runthread3.start()
 
-    def clickLabel31(self):
+    def clickPicClassfy(self):
         self.call_backlog("正在按文本内容对图片分组 ,请稍后...")
-        try:
-            full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
-            filepath = self.open_file(full_dir)
-            if filepath:
-                self.call_backlog("正在按文本内容对图片分组 ,请稍后...")
-                self.runthread31.set_data(filepath)
-                self.runthread31.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel3().Exception={e}】")
-            pass
+        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
+        filepath = self.open_file(full_dir)
+        if filepath:
+            self.call_backlog("正在按文本内容对图片分组 ,请稍后...")
+            self.runthread31.set_data(filepath)
+            self.runthread31.start()
 
     def open_file(self, dir):
         fileName, fileType = QtWidgets.QFileDialog.getOpenFileName(self, "选取文件", dir,
@@ -263,45 +246,26 @@ class MainUi(QtWidgets.QMainWindow):
         print(fileName, fileType)
         return fileName
 
-    def clickLabel4(self):
+    def clickUploadText(self):
         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
         filepath = self.open_file(full_dir)
         if filepath:
             self.runthread4.set_data(filepath)
             self.call_backlog("正在上传文本到后台 ,请稍后...")
-            try:
-                self.left_label_4.setEnabled(False)
-                self.runthread4.start()
-            except Exception as e:
-                self.call_backlog(f"【clickLabel4().Exception={e}】")
-                pass
+            self.runthread4.start()
 
-    def clickLabel5(self):
+    def clickUploadPic(self):
         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
         filepath = self.open_file(full_dir)
         if filepath:
             self.runthread5.set_data(filepath)
             self.call_backlog("正在上传图片到后台 ,请稍后...")
-            try:
-                self.left_label_5.setEnabled(False)
-                self.runthread5.start()
-            except Exception as e:
-                self.call_backlog(f"【clickLabel5().Exception={e}】")
-                pass
+            self.runthread5.start()
 
-    def clickLabel6(self):
-        try:
-            self.stopRunner.start()
-        except Exception as e:
-            self.call_backlog(f"【clickLabel6().Exception={e}】")
-
-        self.left_label_0.setEnabled(True)
-        self.left_label_01.setEnabled(True)
-        self.left_label_1.setEnabled(True)
-        self.left_label_2.setEnabled(True)
-        self.left_label_3.setEnabled(True)
-        self.left_label_4.setEnabled(True)
-        self.left_label_5.setEnabled(True)
+    def clickStopLabel(self):
+        self.stopRunner.start()
+        for btn in self.buttons:
+            btn.setEnabled(True)
 
 
 def main():

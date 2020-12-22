@@ -42,6 +42,20 @@ def uploadItems(array):
         pass
 
 
+def putItems(array):
+    try:
+        for index, item in enumerate(array):
+            if wx_stop.stopFlag:
+                break
+            Logger.println(f"【({index}).item={item}】")
+            res = requests.put("http://internal.zuker.im/moment", json=item)
+            jsonstr = json.dumps(res.json(), indent=4, ensure_ascii=False)
+            Logger.println(f"【({index}).res={jsonstr}】")
+    except Exception as e:
+        Logger.println(f"【e={e}】")
+        pass
+
+
 if __name__ == '__main__':
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "text"))

@@ -194,7 +194,7 @@ class Moments(MomentsBase):
                             self.swipeLeft()
 
                     md5_contents.append(md5_)
-                date = time_util.now_to_date('%Y%m%d_%H')
+                date = time_util.now_to_date('%Y%m%d')
                 full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                      date + "wx_pic_moments.xls")
                 excel_util.write_excel_append(filename=full_dir, worksheet_name=date,

@@ -7,15 +7,16 @@ from PyQt5.QtCore import pyqtSignal, QThread
 
 from common import Logger, excel_util
 from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk_addfriend, \
-    WxPicUploader, main_bulk_modifyname_to_phone, wx_stop
+    WxPicUploader, main_bulk_modifyname_to_phone, wx_stop, wx_main_contacts
 
 
 class EventConst():
-    MAIN_BULK_M_NAME = 0
+    WX_CONTACT = 0
+    MAIN_BULK_M_NAME = WX_CONTACT + 1
     MAIN_BULK_ADDFRIEND = MAIN_BULK_M_NAME + 1
     WX_MAIN = MAIN_BULK_ADDFRIEND + 1
     WX_MAIN_PIC = WX_MAIN + 1
-    WX_EXPORT = WX_MAIN + 1
+    WX_EXPORT = WX_MAIN_PIC + 1
     WX_PICCLASSFY = WX_EXPORT + 1
     WX_UPLOADER = WX_PICCLASSFY + 1
     WX_PICUPLOADER = WX_UPLOADER + 1
@@ -75,7 +76,9 @@ class Runthread(QThread):
         Logger.init(self.signals)
         wx_stop.stopFlag = False
         try:
-            if self.fuc_code == EventConst.MAIN_BULK_ADDFRIEND:
+            if self.fuc_code == EventConst.WX_CONTACT:
+                wx_main_contacts.Moments().main()
+            elif self.fuc_code == EventConst.MAIN_BULK_ADDFRIEND:
                 main_bulk_addfriend.Moments().main()
             elif self.fuc_code == EventConst.MAIN_BULK_M_NAME:
                 main_bulk_modifyname_to_phone.Moments().main()

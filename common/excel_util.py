@@ -165,6 +165,7 @@ def write_excel(filename, worksheet_name, items):
 
 
 def write_excel_append(filename, worksheet_name, items):
+    Logger.println(f"【append_to_excel().items={items}】")
     if not os.path.exists(filename):
         write_excel(filename, worksheet_name, items)
     else:
