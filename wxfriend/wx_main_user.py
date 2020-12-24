@@ -64,6 +64,7 @@ class Moments(MomentsBase):
             if finished:
                 break
             for item in items:
+                self.scan_all_text_elment(item)
                 b_e_content = None
                 content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
                 if content_element:

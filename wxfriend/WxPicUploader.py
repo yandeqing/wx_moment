@@ -96,6 +96,9 @@ def main(full_dir):
             break
         content_md5 = item['content_md5']
         count = int(item['count'])
+        if count == 0:
+            Logger.println(f"【{content_md5}没有抓取到图片】")
+            continue
         Logger.println(f"【().content_md5={content_md5}】")
         try:
             files = FilePathUtil.get_files_by_dir(

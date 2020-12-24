@@ -19,6 +19,31 @@ def exec_shell(command, deviceId='98882048434756494f'):
     exe_shell(shell)
 
 
+def getImiDefault():
+    shell = f' adb shell ime list -a'
+    Logger.println(f"【exec_shell().shell={shell}】")
+    linesStr = list(os.popen(shell).readlines())
+    for line in linesStr:
+        Logger.println(f"{line}")
+        if 'IME' in line:
+            replace = line.replace(':', '')
+            Logger.println(f"【().找到默认输入法:{replace}】")
+            return replace
+
+
+def setImiDefault():
+    default = getImiDefault()
+    shell = f' adb shell ime set {default}'
+    Logger.println(f"【exec_shell().shell={shell}】")
+    linesStr = list(os.popen(shell).readlines())
+    for line in linesStr:
+        Logger.println(f"{line}")
+        if 'IME' in line:
+            replace = line.replace(':', '')
+            Logger.println(f"【().已经恢复默认输入法:{replace}】")
+            return replace
+
+
 def exe_shell(shell):
     Logger.println(f"【exec_shell().shell={shell}】")
     linesStr = list(os.popen(shell).readlines())
@@ -28,6 +53,11 @@ def exe_shell(shell):
 
 def stop_server():
     shell = f'adb kill-server'
+    Logger.println(f"【exec_shell().shell={shell}】")
+    exe_shell(shell)
+
+def start_server():
+    shell = f'adb start-server '
     Logger.println(f"【exec_shell().shell={shell}】")
     exe_shell(shell)
 

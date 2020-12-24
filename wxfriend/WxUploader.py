@@ -35,8 +35,11 @@ def uploadItems(array):
                 break
             Logger.println(f"【({index}).item={item}】")
             res = requests.post("http://internal.zuker.im/moment", json=item)
-            jsonstr = json.dumps(res.json(), indent=4, ensure_ascii=False)
-            Logger.println(f"【({index}).res={jsonstr}】")
+            res_json = res.json()
+            jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+            Logger.println(f"【uploadItems({index}).res={jsonstr}】")
+            if res_json['code'] == 20003:
+                put_item(index, item)
     except Exception as e:
         Logger.println(f"【e={e}】")
         pass
@@ -47,13 +50,17 @@ def putItems(array):
         for index, item in enumerate(array):
             if wx_stop.stopFlag:
                 break
-            Logger.println(f"【({index}).item={item}】")
-            res = requests.put("http://internal.zuker.im/moment", json=item)
-            jsonstr = json.dumps(res.json(), indent=4, ensure_ascii=False)
-            Logger.println(f"【({index}).res={jsonstr}】")
+            put_item(index, item)
     except Exception as e:
         Logger.println(f"【e={e}】")
         pass
+
+
+def put_item(index, item):
+    Logger.println(f"【put_item({index}).item={item}】")
+    res = requests.put("http://internal.zuker.im/moment", json=item)
+    jsonstr = json.dumps(res.json(), indent=4, ensure_ascii=False)
+    Logger.println(f"【({index}).res={jsonstr}】")
 
 
 if __name__ == '__main__':

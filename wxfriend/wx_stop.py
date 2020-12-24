@@ -12,10 +12,12 @@ from time import sleep
 
 from common import excel_util, time_util, FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend.PicClassfyUtil import stop_server
+from wxfriend import PicClassfyUtil
+from wxfriend.PicClassfyUtil import stop_server, start_server
 from wxfriend.wx_swipe_base import MomentsBase
 
-stopFlag=False
+stopFlag = False
+
 
 class Moments(MomentsBase):
     def __init__(self):
@@ -26,15 +28,15 @@ class Moments(MomentsBase):
         super().__init__()
         self.config = MonitorConfig()
 
-
-
     def main(self):
         """
         入口
         :return:
         """
         # 执行adb断开
+        PicClassfyUtil.setImiDefault()
         stop_server()
+        start_server()
         self.stop()
 
     def main_backgroud(self):

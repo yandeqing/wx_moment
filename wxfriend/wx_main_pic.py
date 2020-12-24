@@ -151,6 +151,7 @@ class Moments(MomentsBase):
                                     'file_ids': '',
                                     'start': start,
                                     'end': end,
+                                    'crawl_time': time_util.now_to_date(),
                                     'count': str(index_img)
                                 }
                                 if start != '0':
@@ -184,6 +185,7 @@ class Moments(MomentsBase):
                                     'file_ids': '',
                                     'start': start,
                                     'end': end,
+                                    'crawl_time': time_util.now_to_date(),
                                     'count': str(index_img + 1)
                                 }
                                 if start != '0':
@@ -192,18 +194,20 @@ class Moments(MomentsBase):
                                 break
                             sleep(1)
                             self.swipeLeft()
-
                     md5_contents.append(md5_)
-                date = time_util.now_to_date('%Y%m%d')
-                full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
-                                                     date + "wx_pic_moments.xls")
-                excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
-                                              items=contents)
-                value = self.config.get_value("wx_content", "select")
-                if value == 'True':
-                    WxUploader.uploadItems(contents)
-                contents.clear()
-                index += 1
+                if len(items) > 0:
+                    date = time_util.now_to_date('%Y%m%d_%H')
+                    full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
+                                                         date + "wx_pic_moments.xls")
+                    excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
+                                                  items=contents)
+                    value = self.config.get_value("wx_content", "select")
+                    if value == 'True':
+                        WxUploader.uploadItems(contents)
+                    contents.clear()
+                    index += 1
+                else:
+                    Logger.println(f"【没有数据不处理】")
                 md5 = None
                 if len(md5_contents) > 1:
                     md5 = ','.join(md5_contents[0:2])

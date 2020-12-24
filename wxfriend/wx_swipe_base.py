@@ -197,6 +197,24 @@ class MomentsBase():
         except:
             pass
 
+    def scan_all_text_elment(self, driver=None):
+        '''
+        输出所有带文本的控件id和内容
+        :param driver:
+        :return:
+        '''
+        content = ""
+        driver = driver or self.driver
+        txtItems = self.find_elements_by_xpath("//*", driver)
+        for txitem in txtItems:
+            attribute = txitem.get_attribute('text')
+            attribute1 = txitem.get_attribute('content-desc')
+            if attribute or attribute1:
+                resourceId = txitem.get_attribute("resource-id")
+                Logger.println(f"【找到文本控件resourceId={resourceId}】{attribute or attribute1}")
+                content += attribute or attribute1
+        return content
+
     def find_elements_by_xpath(self, xpath, driver=None):
         driver = driver or self.driver
         try:

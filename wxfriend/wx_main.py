@@ -48,7 +48,7 @@ class Moments(MomentsBase):
         """
         index = 0
         contents = []
-        finished=False
+        finished = False
         md5_contents = []
         while True:
             if wx_stop.stopFlag:
@@ -69,7 +69,7 @@ class Moments(MomentsBase):
                     content_element.click()
                     sleep(2)
                     b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
-                    if  b_e_content:
+                    if b_e_content:
                         Logger.println(f"【获取到全文内容={b_e_content}】")
                         self.driver.back()
                 if b_e_content is None:
@@ -87,6 +87,7 @@ class Moments(MomentsBase):
                     'nick_name': nickName,
                     'content': b_e_content,
                     'phone': phone,
+                    'crawl_time': time_util.now_to_date(),
                     'file_ids': '',
                 }
                 if md5_ in self.wx_content_md5:
@@ -98,7 +99,7 @@ class Moments(MomentsBase):
                         md5 = md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5", md5)
-                    finished=True
+                    finished = True
                     break
                 if md5_ in md5_contents:
                     continue
