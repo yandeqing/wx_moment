@@ -11,6 +11,7 @@ from telnetlib import EC
 from time import sleep
 
 from appium.webdriver.common import mobileby
+from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
 from appium import webdriver
@@ -76,6 +77,18 @@ class MomentsBase():
         except:
             return None
             pass
+
+    def double_click(self, element, driver=None):
+        driver = driver or self.driver
+        action = TouchAction(driver)
+        action.press(element).release().press(element).release().perform()
+        Logger.println(f'double click element({element})')
+
+    def long_press(self, element, driver=None):
+        driver = driver or self.driver
+        action1 = TouchAction(driver)
+        action1.long_press(el=element, duration=500).perform()
+        Logger.println(f'long_press element({element})')
 
     def get_phone_from_txt(self, text):
         phone_reg = re.compile('[0-9]{11}', re.MULTILINE)

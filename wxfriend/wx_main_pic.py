@@ -35,11 +35,14 @@ class Moments(MomentsBase):
         by_id = self.find_element_by_id('com.tencent.mm:id/czl')
         el2 = by_id.find_element_by_xpath(
             '//android.widget.LinearLayout/android.widget.RelativeLayout[3]')
-
         el2.click()
         sleep(3)
         el3 = self.driver.find_element_by_id('com.tencent.mm:id/f43')
         el3.click()
+        sleep(3)
+        el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
+        self.double_click(el)
+        sleep(3)
 
     def crawl(self):
         self.enter()
@@ -52,6 +55,15 @@ class Moments(MomentsBase):
         contents = []
         finished = False
         while True:
+            if index > 500:
+                Logger.println(f"【抓取数量大于500,停止抓取】")
+                break
+            # timestr = time_util.now_to_date('%Y-%m-%d') + " 01:00:00"
+            # des_timestamp = time_util.date_to_timestamp(timestr)
+            # now_timestamp = time_util.now_to_timestamp()
+            # if now_timestamp > des_timestamp:
+            #     Logger.println(f"【到达休息时间点:{time_util.now_to_date()}】")
+            #     break
             if wx_stop.stopFlag:
                 break
             if index > 0:
@@ -196,7 +208,7 @@ class Moments(MomentsBase):
                             self.swipeLeft()
                     md5_contents.append(md5_)
                 if len(items) > 0:
-                    date = time_util.now_to_date('%Y%m%d_%H')
+                    date = time_util.now_to_date('%Y%m%d')
                     full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                          date + "wx_pic_moments.xls")
                     excel_util.write_excel_append(filename=full_dir, worksheet_name=date,

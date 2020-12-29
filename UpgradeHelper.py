@@ -65,6 +65,8 @@ class UpgradeHelperDialog(QDialog):
         return fileName
 
     def save(self):
+        text = self.le1.text()
+        WxConfig.setAppexeReplaceDir(text)
         self.runthread.start()
 
 

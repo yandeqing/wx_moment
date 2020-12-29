@@ -66,7 +66,9 @@ class Moments(MomentsBase):
                 else:
                     continue
                 if nickName in nickNames:
+                    Logger.println(f"【已经抓取跳过联系人{nickName}】")
                     continue
+                nickNames.append(nickName)
                 phone = self.get_phone_from_txt(nickName)
                 wx_number = ""
                 try:
@@ -100,7 +102,6 @@ class Moments(MomentsBase):
                                                      date + "wx_contacts_moments.xls")
                 excel_util.write_excel(filename=full_dir, worksheet_name=date,
                                               items=contents)
-                nickNames.append(nickName)
                 index += 1
             last_flag = self.getContentTextById("com.tencent.mm:id/azb")
             if last_flag:
