@@ -78,22 +78,32 @@ def setAppexeReplaceDir(appexe_replace_dir):
 def setServerUrl(server_url):
     return config.set_value('appiumConfig', 'driver_server', server_url)
 
+##获取设备多台设备号列表
+def getDeviceid():
+    str_init=' '
+    all_info= os.popen('adb devices').readlines()
+    print('adb devices 输出的内容是：',all_info)
+    for i in range(len(all_info)):
+        str_init+=all_info[i]
+    devices_name=re.findall('\n(.+?)\t',str_init,re.S)
+    print('所有设备名称：\n',devices_name)
+    return devices_name
 
 def getAppiumConfig():
     deviceId = ''
     deviceVersion = ''
     try:
         # 读取设备 id
-        readDeviceId = list(os.popen('adb devices').readlines())
-
         # 正则表达式匹配出 id 信息
-        deviceId = re.findall(r'^\w*\b', readDeviceId[1])[0]
+        deviceId =getDeviceid()[0]
+        # readDeviceId = list(os.popen('adb devices').readlines())
+        # deviceId = re.findall(r'^\w*\b', readDeviceId[1])[0]
         # 读取设备系统版本号
         deviceAndroidVersion = list(
-            os.popen('adb shell getprop ro.build.version.release').readlines())
+            os.popen(f'adb -s {deviceId} shell getprop ro.build.version.release').readlines())
         deviceVersion = re.findall(r'^\w*\b', deviceAndroidVersion[0])[0]
-    except:
-        pass
+    except Exception as e:
+        Logger.println(f"get deviceAndroidVersion Exception【e={e}】")
 
     appiumConfig = {
         "platformName": "Android",
@@ -106,6 +116,7 @@ def getAppiumConfig():
         "unicodeKeyboard": "True",
         "resetKeyboard": "True"
     }
+    Logger.println(f"【appium_config={appiumConfig}】")
     return appiumConfig
 
 

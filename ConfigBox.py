@@ -114,8 +114,9 @@ class ConfigDialog(QDialog):
         self.close()
 
     def reconnect(self):
-        deviceId = WxConfig.getAppiumConfig()["deviceName"]
-        platformVersion = WxConfig.getAppiumConfig()["platformVersion"]
+        config = WxConfig.getAppiumConfig()
+        deviceId = config["deviceName"]
+        platformVersion = config["platformVersion"]
 
         self.le0.setText(deviceId)
         self.le1.setText(platformVersion)

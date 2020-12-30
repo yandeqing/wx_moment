@@ -80,8 +80,8 @@ class MomentsBase():
 
     def double_click(self, element, driver=None):
         driver = driver or self.driver
-        action = TouchAction(driver)
-        action.press(element).release().press(element).release().perform()
+        # action = TouchAction(driver)
+        # action.tap(element).release().tap(element).release().perform()
         Logger.println(f'double click element({element})')
 
     def long_press(self, element, driver=None):
@@ -217,15 +217,23 @@ class MomentsBase():
         :return:
         '''
         content = ""
-        driver = driver or self.driver
-        txtItems = self.find_elements_by_xpath("//*", driver)
-        for txitem in txtItems:
-            attribute = txitem.get_attribute('text')
-            attribute1 = txitem.get_attribute('content-desc')
-            if attribute or attribute1:
-                resourceId = txitem.get_attribute("resource-id")
-                Logger.println(f"【找到文本控件resourceId={resourceId}】{attribute or attribute1}")
-                content += attribute or attribute1
+        try:
+            driver = driver or self.driver
+            txtItems = self.find_elements_by_xpath("//*", driver)
+            if txtItems:
+                for txitem in txtItems:
+                    attribute = txitem.get_attribute('text')
+                    resourceId = txitem.get_attribute("resource-id")
+                    if attribute:
+                        Logger.println(f"【找到text文本控件resourceId={resourceId}】{attribute}")
+                        content += attribute
+                    attribute1 = txitem.get_attribute('content-desc')
+                    if attribute1:
+                        Logger.println(f"【找到content-desc文本控件resourceId={resourceId}】{attribute1}")
+                        content += attribute1
+        except Exception as e:
+            Logger.println(f"【scan_all_text_elment().e={e}】")
+            pass
         return content
 
     def find_elements_by_xpath(self, xpath, driver=None):

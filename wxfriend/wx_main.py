@@ -64,6 +64,11 @@ class Moments(MomentsBase):
                 break
             for item in items:
                 b_e_content = None
+                advise = self.find_element_by_xpath(
+                    "//android.widget.TextView[contains(@text,'广告')]",item)
+                if advise:
+                    Logger.println(f"【============检测到广告忽略进入下一条================】")
+                    continue
                 content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
                 if content_element:
                     content_element.click()

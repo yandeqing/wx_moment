@@ -31,7 +31,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(8)
         by_id = self.find_element_by_id('com.tencent.mm:id/czl')
         el2 = by_id.find_element_by_xpath(
             '//android.widget.LinearLayout/android.widget.RelativeLayout[3]')
@@ -78,6 +78,11 @@ class Moments(MomentsBase):
             for item in items:
                 b_e_content = None
                 last_pic_md5 = None
+                advise = self.find_element_by_xpath(
+                    "//android.widget.TextView[contains(@text,'广告')]", item)
+                if advise:
+                    Logger.println(f"【============检测到广告忽略进入下一条================】")
+                    continue
                 content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
                 if content_element:
                     content_element.click()
@@ -150,8 +155,9 @@ class Moments(MomentsBase):
                             if index_img == 0:
                                 start = FilePathUtil.get_time()
                             sleep(0.5)
-                            base64 = self.get_screenshot_as_base64(image_detail)
-                            pic_md5 = self.MD5(base64)
+                            text_content = self.scan_all_text_elment()
+                            Logger.println(f"【crawl.{index} text_content ={text_content}】")
+                            pic_md5 = self.MD5(text_content)
                             if last_pic_md5 == pic_md5:
                                 end = FilePathUtil.get_time()
                                 data = {
@@ -160,7 +166,6 @@ class Moments(MomentsBase):
                                     'wx_number': wx_number,
                                     'content': b_e_content,
                                     'phone': phone,
-                                    'file_ids': '',
                                     'start': start,
                                     'end': end,
                                     'crawl_time': time_util.now_to_date(),
@@ -178,14 +183,16 @@ class Moments(MomentsBase):
                                 sleep(0.5)
                                 self.find_element_by_xpath(
                                     "//android.widget.TextView[contains(@text,'保存图片')]").click()
-                            except:
+                            except Exception as e:
+                                Logger.println(f'TouchAction Exception{e}')
                                 continue
                                 pass
                             time = FilePathUtil.get_time()
                             Logger.println(f"【crawl({index}.{index_img}).已保存图片=mmexport{time}.jpg】")
                             last_pic_md5 = pic_md5
-                            is_oppo = self.desired_caps['deviceName'] == '5e8caad5'
-                            if index_img == 8 or is_oppo:
+                            # is_oppo = self.desired_caps['deviceName'] == '5e8caad5'
+                            if index_img == 8:
+                                # if index_img == 8 or is_oppo:
                                 sleep(1)
                                 end = FilePathUtil.get_time()
                                 data = {
@@ -194,7 +201,6 @@ class Moments(MomentsBase):
                                     'wx_number': wx_number,
                                     'content': b_e_content,
                                     'phone': phone,
-                                    'file_ids': '',
                                     'start': start,
                                     'end': end,
                                     'crawl_time': time_util.now_to_date(),
@@ -207,7 +213,7 @@ class Moments(MomentsBase):
                             sleep(1)
                             self.swipeLeft()
                     md5_contents.append(md5_)
-                if len(items) > 0:
+                if len(contents) > 0:
                     date = time_util.now_to_date('%Y%m%d')
                     full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                          date + "wx_pic_moments.xls")

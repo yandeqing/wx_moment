@@ -100,4 +100,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    setImiDefault()
+# if __name__ == '__main__':
+#     main()
