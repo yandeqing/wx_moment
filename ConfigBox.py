@@ -41,7 +41,7 @@ class ConfigDialog(QDialog):
         self.le3.setText(add_friend_max_count)
         layout.addRow(self.label, self.le3)
 
-        self.label = QLabel("添加好友时间间隔(秒):")
+        self.label = QLabel("任务暂停后继续执行的时间间隔(秒):")
         self.le31 = QLineEdit()
         addfriend_inte_seconds = WxConfig.get_addfriend_inte_seconds()
         self.le31.setText(addfriend_inte_seconds)

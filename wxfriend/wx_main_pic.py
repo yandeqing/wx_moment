@@ -6,13 +6,13 @@
 '''
 # from pymongo import MongoClient
 import threading
-from time import sleep
+from time import sleep, time
 
 from appium.webdriver.common.touch_action import TouchAction
 
 from common import FilePathUtil, time_util, excel_util, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend import wx_stop, WxUploader
+from wxfriend import wx_stop, WxUploader, WxConfig
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -24,6 +24,7 @@ class Moments(MomentsBase):
         # 驱动配置
         super().__init__()
         self.config = MonitorConfig()
+        self.addfriend_inte_seconds = int(WxConfig.get_addfriend_inte_seconds())
         self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
 
     def enter(self):
@@ -113,7 +114,16 @@ class Moments(MomentsBase):
                     finished = True
                     self.driver.back()
                     # 延迟一段时间
-                    sleep(self.get_sleep(15, 20))
+                    start_time = int(time())
+                    sleeptime = self.addfriend_inte_seconds
+                    Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={index}个任务】")
+                    while True:
+                        rdsleep = self.get_sleep(5, 6)
+                        if rdsleep == 5:
+                            self.scan_all_text_elment()
+                        sleep(rdsleep)
+                        if int(time()) - start_time > sleeptime:
+                            break
                     self.crawl()
                     break
                 if md5_ in md5_contents:
@@ -187,8 +197,8 @@ class Moments(MomentsBase):
                                 Logger.println(f'TouchAction Exception{e}')
                                 continue
                                 pass
-                            time = FilePathUtil.get_time()
-                            Logger.println(f"【crawl({index}.{index_img}).已保存图片=mmexport{time}.jpg】")
+                            Logger.println(
+                                f"【crawl({index}.{index_img}).已保存图片=mmexport{FilePathUtil.get_time()}.jpg】")
                             last_pic_md5 = pic_md5
                             # is_oppo = self.desired_caps['deviceName'] == '5e8caad5'
                             if index_img == 8:

@@ -5,7 +5,7 @@ from threading import Thread
 # 继承QThread
 from PyQt5.QtCore import pyqtSignal, QThread
 
-from common import Logger, excel_util
+from common import Logger, excel_util, DingDingSdk
 from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk_addfriend, \
     WxPicUploader, main_bulk_modifyname_to_phone, wx_stop, wx_main_contacts
 
@@ -100,4 +100,6 @@ class Runthread(QThread):
                 Logger.println(f'没有响应事件={self.fuc_code}')
         except Exception as e:
             Logger.println(f"【run().e={e}】")
+            if self.fuc_code == EventConst.WX_MAIN_PIC:
+                DingDingSdk.send_message(f"朋友圈数据抓取出现异常:{e}")
         # self.signals.emit("任务已完成")
