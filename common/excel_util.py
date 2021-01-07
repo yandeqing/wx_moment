@@ -22,7 +22,7 @@ def get_xls(xlsPath, sheet_name=None):
     :return:
     """
     cls = []
-    file = xlrd.open_workbook(xlsPath)
+    file = xlrd.open_workbook(xlsPath, encoding_override=True)
     if sheet_name:
         sheet = file.sheet_by_name(sheet_name)
     else:
@@ -60,7 +60,7 @@ def excel2array(xlsPath, sheet_name=None):
             arrays.append(param)
         return arrays
     except Exception as e:
-        Logger.println(f"【modify().e={e}】")
+        Logger.println(f"【excel2array().e={e}】")
         return None
 
 
@@ -145,12 +145,12 @@ def rows_write(ws, row_x, rows):
 
 def write_excel(filename, worksheet_name, items):
     if not os.path.exists(filename):
-        f = open(filename, "w+")
+        f = open(filename, "w+",encoding='utf-8')
         f.close()
     '''
     :return:
     '''
-    workbook = xlwt.Workbook(encoding='ascii')
+    workbook = xlwt.Workbook(encoding='utf-8')
     worksheet = workbook.add_sheet(worksheet_name)
     if len(items) > 0:
         keys = list(items[0].keys())

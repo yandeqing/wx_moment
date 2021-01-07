@@ -7,6 +7,8 @@ from datetime import datetime
 from PyQt5.QtCore import pyqtSignal
 
 # 开关
+from common import DingDingSdk
+
 debug = True
 mSignal: pyqtSignal = None
 
@@ -18,10 +20,14 @@ def println(msg):
         return
     global mSignal
     if mSignal is None:
-        print(strftime + msg)
+        print(f"{strftime} {msg}")
     else:
         mSignal.emit(strftime + str(msg))
     pass
+
+
+def dingdingException(msg):
+    DingDingSdk.send_message(f"朋友圈数据抓取出现异常:{msg}")
 
 
 def init(signal: pyqtSignal = None):

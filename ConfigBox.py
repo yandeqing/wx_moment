@@ -95,13 +95,13 @@ class ConfigDialog(QDialog):
 
     def save(self):
         server_url = self.le2.text()
-        WxConfig.setServerUrl(server_url)
+        self.config.set_value('appiumConfig', 'driver_server', server_url)
 
         max = self.le3.text()
-        WxConfig.set_friend_max_count(max)
+        self.config.set_value('appiumConfig', 'addFriendMaxCount', max)
 
         addfriend_inte_seconds = self.le31.text()
-        WxConfig.set_get_addfriend_inte_seconds(addfriend_inte_seconds)
+        self.config.set_value('appiumConfig', 'addfriend_inte_seconds', addfriend_inte_seconds)
 
         md5_pic = self.le5.text()
         self.config.set_value("wx_content", "md5_pic", md5_pic)

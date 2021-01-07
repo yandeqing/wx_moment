@@ -34,7 +34,6 @@ class Moments(MomentsBase):
         :return:
         """
         # 执行adb断开
-        PicClassfyUtil.setImiDefault()
         stop_server()
         start_server()
         self.stop()

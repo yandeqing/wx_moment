@@ -10,8 +10,10 @@ from PyQt5.QtWidgets import QAction
 from ConfigBox import ConfigDialog
 from common import Logger, FilePathUtil
 from common.FilePathUtil import startfile
+from config.AppConfig import MonitorConfig
 from wxfriend import WxConfig
-from wxfriend.window_main_function_manager import Runthread, EventConst, StopRunthread
+from wxfriend.window_main_function_manager import Runthread, EventConst, StopRunthread, \
+    KeyBoardRunthread
 
 
 class MainUi(QtWidgets.QMainWindow):
@@ -54,7 +56,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.main_widget = QtWidgets.QWidget()  # 创建窗口主部件
         self.main_layout = QtWidgets.QGridLayout()  # 创建主部件的网格布局
         self.main_widget.setLayout(self.main_layout)  # 设置窗口主部件布局为网格布局
-
+        self.config = MonitorConfig()
         # 配置服务器地址
         configAction = QAction(QIcon('exit.png'), '配置', self)
         configAction.setShortcut('Ctrl+Alt+S')
@@ -118,6 +120,7 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '按文本内容对图片分组', 'objName': 'left_label'},
                   {'label': '上传文本到后台', 'objName': 'left_label'},
                   {'label': '上传图片到后台', 'objName': 'left_label'},
+                  {'label': '恢复输入法', 'objName': 'left_label'},
                   {'label': '停止任务', 'objName': 'left_label'}]
 
         self.buttons = []
@@ -147,6 +150,8 @@ class MainUi(QtWidgets.QMainWindow):
             elif index == 8:
                 btn.clicked.connect(self.clickUploadPic)
             elif index == 9:
+                btn.clicked.connect(self.clickKeyboardLabel)
+            elif index == 10:
                 btn.clicked.connect(self.clickStopLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
@@ -171,6 +176,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
         self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
         self.stopRunner = StopRunthread()
+        self.boardRunthread = KeyBoardRunthread()
         self.runthread.signals.connect(self.call_backlog)
         self.runthread0.signals.connect(self.call_backlog)
         self.runthread01.signals.connect(self.call_backlog)
@@ -182,6 +188,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5.signals.connect(self.call_backlog)
         self.runthread6.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
+        self.boardRunthread.signals.connect(self.call_backlog)
 
         self.right_label = QtWidgets.QTextEdit("")
         self.right_label.setPlaceholderText("日志输出区")
@@ -198,6 +205,12 @@ class MainUi(QtWidgets.QMainWindow):
             self.statusBar().showMessage(f'手机号文件地址:{excel}')
         else:
             self.statusBar().showMessage(f'请先点击配置菜单配置数据')
+
+        value = self.config.get_value("wx_content", "select")
+        if value == 'True':
+            self.buttons[7].setEnabled(False)
+        else:
+            self.buttons[7].setEnabled(True)
 
     def call_backlog(self, text):
         self.right_label.append(f"{text}")
@@ -264,6 +277,11 @@ class MainUi(QtWidgets.QMainWindow):
 
     def clickStopLabel(self):
         self.stopRunner.start()
+        for btn in self.buttons:
+            btn.setEnabled(True)
+
+    def clickKeyboardLabel(self):
+        self.boardRunthread.start()
         for btn in self.buttons:
             btn.setEnabled(True)
 

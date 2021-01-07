@@ -40,6 +40,7 @@ def uploadItems(array):
             Logger.println(f"【uploadItems({index}).res={jsonstr}】")
             if res_json['code'] == 20003:
                 put_item(index, item)
+                return  '20003'
     except Exception as e:
         Logger.println(f"【e={e}】")
         pass

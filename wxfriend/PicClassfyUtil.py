@@ -100,6 +100,9 @@ def main():
 
 
 if __name__ == '__main__':
-    setImiDefault()
+    # setImiDefault()
 # if __name__ == '__main__':
 #     main()
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    classify(full_dir)

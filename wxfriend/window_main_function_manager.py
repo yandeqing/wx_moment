@@ -57,6 +57,23 @@ class StopRunthread(QThread):
         except Exception as e:
             Logger.println(f"【run().e={e}】")
 
+class KeyBoardRunthread(QThread):
+    signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
+
+    def __init__(self, fuc_code=None):
+        super(KeyBoardRunthread, self).__init__()
+        self.fuc_code = fuc_code
+
+    def run(self):
+        Logger.init(self.signals)
+        try:
+            Logger.println(f"【run()开始恢复输入法】")
+            PicClassfyUtil.setImiDefault()
+            Logger.println(f"【run()已经恢复输入法】")
+        except Exception as e:
+            Logger.println(f"【run().e={e}】")
+
+
 
 class Runthread(QThread):
     signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
@@ -101,5 +118,5 @@ class Runthread(QThread):
         except Exception as e:
             Logger.println(f"【run().e={e}】")
             if self.fuc_code == EventConst.WX_MAIN_PIC:
-                DingDingSdk.send_message(f"朋友圈数据抓取出现异常:{e}")
+                Logger.dingdingException(f"{e}")
         # self.signals.emit("任务已完成")

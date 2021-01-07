@@ -41,9 +41,9 @@ class Moments(MomentsBase):
         el3 = self.driver.find_element_by_id('com.tencent.mm:id/f43')
         el3.click()
         sleep(3)
-        el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
-        self.double_click(el)
-        sleep(3)
+        # el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
+        # self.double_click(el)
+        # sleep(3)
 
     def crawl(self):
         self.enter()
@@ -156,6 +156,8 @@ class Moments(MomentsBase):
                 image0 = self.find_element_by_xpath(
                     "//*[@content-desc='图片']", item)
                 if image0:
+                    Logger.println(
+                        f"【crawl({index}).开始点击图片】")
                     image0.click()
                     sleep(1)
                     start = '0'
@@ -164,11 +166,12 @@ class Moments(MomentsBase):
                         if image_detail:
                             if index_img == 0:
                                 start = FilePathUtil.get_time()
-                            sleep(0.5)
+                            sleep(1)
                             text_content = self.scan_all_text_elment()
                             Logger.println(f"【crawl.{index} text_content ={text_content}】")
                             pic_md5 = self.MD5(text_content)
                             if last_pic_md5 == pic_md5:
+                                Logger.println(f"【crawl({index}.{index_img}).前后图片一致退出】")
                                 end = FilePathUtil.get_time()
                                 data = {
                                     'content_md5': md5_,
@@ -190,11 +193,16 @@ class Moments(MomentsBase):
                             try:
                                 action1 = TouchAction(self.driver)
                                 action1.long_press(el=image_detail, duration=500).perform()
-                                sleep(0.5)
-                                self.find_element_by_xpath(
-                                    "//android.widget.TextView[contains(@text,'保存图片')]").click()
+                                sleep(1.5)
+                                saveBtn = self.find_element_by_xpath("//*[contains(@text,'保存图片')]")
+                                if saveBtn:
+                                    saveBtn.click()
+                                else:
+                                    Logger.dingdingException(f"找不到保存按钮,保存图片失败")
                             except Exception as e:
                                 Logger.println(f'TouchAction Exception{e}')
+                                Logger.dingdingException(f"保存图片失败{e}")
+                                self.driver.back()
                                 continue
                                 pass
                             Logger.println(
@@ -224,16 +232,27 @@ class Moments(MomentsBase):
                             self.swipeLeft()
                     md5_contents.append(md5_)
                 if len(contents) > 0:
-                    date = time_util.now_to_date('%Y%m%d')
-                    full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
-                                                         date + "wx_pic_moments.xls")
-                    excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
-                                                  items=contents)
                     value = self.config.get_value("wx_content", "select")
                     if value == 'True':
-                        WxUploader.uploadItems(contents)
-                    contents.clear()
-                    index += 1
+                        Logger.dingdingException(f"开始上传第{index}条数据")
+                        res = WxUploader.uploadItems(contents)
+                        # 有房源刷新的列表
+                        if '20003' == res:
+                            date = time_util.now_to_date('%Y%m%d')
+                            full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
+                                                                 date + "wx_pic_update_moments.xls")
+                            excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
+                                                          items=contents)
+                            contents.clear()
+                    # 新房源列表
+                    if len(contents) > 0:
+                        date = time_util.now_to_date('%Y%m%d')
+                        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
+                                                             date + "wx_pic_moments.xls")
+                        excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
+                                                      items=contents)
+                        contents.clear()
+                        index += 1
                 else:
                     Logger.println(f"【没有数据不处理】")
                 md5 = None
