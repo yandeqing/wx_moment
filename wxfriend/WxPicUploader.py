@@ -7,14 +7,15 @@
 import json
 import os
 import threading
+import time
 from urllib import request
 
 import requests
 from qiniu import put_file
 
-from common import FilePathUtil, excel_util, time_util, Logger
+from common import FilePathUtil, excel_util, Logger
 from config.AppConfig import MonitorConfig
-from wxfriend import wx_stop
+from wxfriend import wx_stop, WxUploader, PicClassfyUtil
 
 
 def put_img(md5, file_ids):
@@ -100,33 +101,66 @@ def main(full_dir):
             Logger.println(f"【{content_md5}没有抓取到图片】")
             continue
         Logger.println(f"【().content_md5={content_md5}】")
-        try:
-            files = FilePathUtil.get_files_by_dir(
-                FilePathUtil.get_full_dir("wxfriend", "pic", "WeiXinCopy", content_md5))
-            tokens = files_token(count=count)
-            if tokens:
-                img_ids = []
-                for index, file in enumerate(files):
-                    if index > count - 1:
-                        Logger.println(f"【content_md5={content_md5}图片出现重复】")
-                        break
-                    img_id = upload_img(tokens[index], file)
-                    img_ids.append(str(img_id))
-                join = ",".join(img_ids)
-                if join:
-                    put_img(content_md5, join)
+        res = WxUploader.uploadItem(item)
+        # 有房源刷新的列表
+        if '20003' == res:
+            Logger.println(f"【().开始图片上传={content_md5}】")
+            try:
+                files = FilePathUtil.get_files_by_dir(
+                    FilePathUtil.get_full_dir("wxfriend", "pic", "WeiXinCopy", content_md5))
+                tokens = files_token(count=count)
+                if tokens:
+                    img_ids = []
+                    for index, file in enumerate(files):
+                        if index > count - 1:
+                            Logger.println(f"【content_md5={content_md5}图片出现重复】")
+                            break
+                        img_id = upload_img(tokens[index], file)
+                        img_ids.append(str(img_id))
+                    join = ",".join(img_ids)
+                    if join:
+                        put_img(content_md5, join)
+                    else:
+                        Logger.println(f"【content_md5={content_md5}没有对应的图片】")
                 else:
-                    Logger.println(f"【content_md5={content_md5}没有对应的图片】")
-            else:
-                Logger.println(f"【token 生成失败】")
-        except Exception as e:
-            Logger.println(f"【{content_md5} 图片上传失败!{e}】")
-            config.set_value("wx_content", "error_md5_pic", content_md5)
+                    Logger.println(f"【token 生成失败】")
+            except Exception as e:
+                Logger.println(f"【{content_md5} 图片上传失败!{e}】")
+                config.set_value("wx_content", "error_md5_pic", content_md5)
+                break
+    Logger.println(f"【本次共完成{len(array)}条朋友圈信息的图片文件上传】")
+
+
+index = 1
+
+
+def batch_export_upload():
+    global index
+    start_time = int(time.time())
+    config = MonitorConfig()
+    sleeptime = 3 * 60
+    value = config.get_value('appiumConfig', 'batch_pic_seconds')
+    if value:
+        sleeptime = int(value)
+    Logger.println(f"【开始批量导出并上传图片batch_pic_seconds={sleeptime}】")
+    while True:
+        time.sleep(5)
+        time_start_time = int(time.time()) - start_time
+        if sleeptime - time_start_time > 0:
+            Logger.println(f"【{sleeptime - time_start_time}秒后执行第={index}个批量导出并上传图片任务】")
+        if (time_start_time) >= sleeptime:
+            index = index + 1
             break
-    Logger.println(f"【共完成{len(array)}条朋友圈信息的图片文件上传】")
-
-
-if __name__ == '__main__':
+        time.sleep(5)
+    PicClassfyUtil.export()
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
     main(full_dir)
+    batch_export_upload()
+
+
+if __name__ == '__main__':
+    batch_export_upload()
+    # full_dir = FilePathUtil.get_lastmodify_file(
+    #     FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    # main(full_dir)

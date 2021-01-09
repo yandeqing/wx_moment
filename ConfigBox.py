@@ -46,6 +46,11 @@ class ConfigDialog(QDialog):
         addfriend_inte_seconds = WxConfig.get_addfriend_inte_seconds()
         self.le31.setText(addfriend_inte_seconds)
         layout.addRow(self.label, self.le31)
+        self.label = QLabel("批量导出图片上传脚本时间间隔(秒):")
+        self.le41 = QLineEdit()
+        batch_pic_seconds = self.config.get_value('appiumConfig', 'batch_pic_seconds')
+        self.le41.setText(batch_pic_seconds)
+        layout.addRow(self.label, self.le41)
 
         self.addbtn = QPushButton("设置手机号文件地址")
         self.addbtn.clicked.connect(self.add_phone_excel)  # 当点击save按钮时，对话框将会消失，点击Cacel按钮时，则不会消失。
@@ -111,6 +116,9 @@ class ConfigDialog(QDialog):
 
         select = self.select_checkbox.isChecked()
         self.config.set_value("wx_content", "select", str(select))
+
+        batch_pic_seconds = self.le41.text()
+        self.config.set_value('appiumConfig', 'batch_pic_seconds',batch_pic_seconds)
         self.close()
 
     def reconnect(self):

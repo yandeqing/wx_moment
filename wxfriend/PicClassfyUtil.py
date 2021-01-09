@@ -56,6 +56,7 @@ def stop_server():
     Logger.println(f"【exec_shell().shell={shell}】")
     exe_shell(shell)
 
+
 def start_server():
     shell = f'adb start-server '
     Logger.println(f"【exec_shell().shell={shell}】")
@@ -101,8 +102,8 @@ def main():
 
 if __name__ == '__main__':
     # setImiDefault()
-# if __name__ == '__main__':
-#     main()
-    full_dir = FilePathUtil.get_lastmodify_file(
-        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    classify(full_dir)
+    # if __name__ == '__main__':
+    main()
+#     full_dir = FilePathUtil.get_lastmodify_file(
+#         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+#     classify(full_dir)

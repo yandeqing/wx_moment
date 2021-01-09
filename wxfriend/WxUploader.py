@@ -40,7 +40,21 @@ def uploadItems(array):
             Logger.println(f"【uploadItems({index}).res={jsonstr}】")
             if res_json['code'] == 20003:
                 put_item(index, item)
-                return  '20003'
+                return '20003'
+    except Exception as e:
+        Logger.println(f"【e={e}】")
+        pass
+
+
+def uploadItem(item):
+    try:
+        Logger.println(f"【item={item}】")
+        res = requests.post("http://internal.zuker.im/moment", json=item)
+        res_json = res.json()
+        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        Logger.println(f"【uploadItems().res={jsonstr}】")
+        if res_json['code'] == 20003:
+            return '20003'
     except Exception as e:
         Logger.println(f"【e={e}】")
         pass

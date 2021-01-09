@@ -121,7 +121,8 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '上传文本到后台', 'objName': 'left_label'},
                   {'label': '上传图片到后台', 'objName': 'left_label'},
                   {'label': '恢复输入法', 'objName': 'left_label'},
-                  {'label': '停止任务', 'objName': 'left_label'}]
+                  {'label': '停止任务', 'objName': 'left_label'},
+                  {'label': '导出图片并上传', 'objName': 'left_label'}]
 
         self.buttons = []
         for index, model in enumerate(models):
@@ -153,6 +154,8 @@ class MainUi(QtWidgets.QMainWindow):
                 btn.clicked.connect(self.clickKeyboardLabel)
             elif index == 10:
                 btn.clicked.connect(self.clickStopLabel)
+            elif index == 11:
+                btn.clicked.connect(self.clickBatchUploadLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
                 padding:10px;
@@ -175,6 +178,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread4 = Runthread(EventConst.WX_UPLOADER)
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
         self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
+        self.runthread7 = Runthread(EventConst.WX_BATCH_UPLOAD)
         self.stopRunner = StopRunthread()
         self.boardRunthread = KeyBoardRunthread()
         self.runthread.signals.connect(self.call_backlog)
@@ -187,6 +191,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread4.signals.connect(self.call_backlog)
         self.runthread5.signals.connect(self.call_backlog)
         self.runthread6.signals.connect(self.call_backlog)
+        self.runthread7.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
         self.boardRunthread.signals.connect(self.call_backlog)
 
@@ -282,8 +287,10 @@ class MainUi(QtWidgets.QMainWindow):
 
     def clickKeyboardLabel(self):
         self.boardRunthread.start()
-        for btn in self.buttons:
-            btn.setEnabled(True)
+
+    def clickBatchUploadLabel(self):
+        self.buttons[11].setEnabled(False)
+        self.runthread7.start()
 
 
 def main():

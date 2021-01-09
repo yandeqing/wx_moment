@@ -5,7 +5,7 @@ from threading import Thread
 # 继承QThread
 from PyQt5.QtCore import pyqtSignal, QThread
 
-from common import Logger, excel_util, DingDingSdk
+from common import Logger, excel_util, DingDingSdk, FilePathUtil
 from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk_addfriend, \
     WxPicUploader, main_bulk_modifyname_to_phone, wx_stop, wx_main_contacts
 
@@ -21,6 +21,7 @@ class EventConst():
     WX_UPLOADER = WX_PICCLASSFY + 1
     WX_PICUPLOADER = WX_UPLOADER + 1
     WX_EXPORT_PHONE = WX_PICUPLOADER + 1
+    WX_BATCH_UPLOAD = WX_EXPORT_PHONE + 1
 
 
 class DownloadRunthread(QThread):
@@ -57,6 +58,7 @@ class StopRunthread(QThread):
         except Exception as e:
             Logger.println(f"【run().e={e}】")
 
+
 class KeyBoardRunthread(QThread):
     signals = pyqtSignal(str)  # 定义信号对象,传递值为str类型，使用int，可以为int类型
 
@@ -72,7 +74,6 @@ class KeyBoardRunthread(QThread):
             Logger.println(f"【run()已经恢复输入法】")
         except Exception as e:
             Logger.println(f"【run().e={e}】")
-
 
 
 class Runthread(QThread):
@@ -113,6 +114,8 @@ class Runthread(QThread):
                 WxPicUploader.main(self.data)
             elif self.fuc_code == EventConst.WX_EXPORT_PHONE:
                 excel_util.exportPhone(self.data)
+            elif self.fuc_code == EventConst.WX_BATCH_UPLOAD:
+                WxPicUploader.batch_export_upload()
             else:
                 Logger.println(f'没有响应事件={self.fuc_code}')
         except Exception as e:

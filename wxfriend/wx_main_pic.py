@@ -56,9 +56,6 @@ class Moments(MomentsBase):
         contents = []
         finished = False
         while True:
-            if index > 500:
-                Logger.println(f"【抓取数量大于500,停止抓取】")
-                break
             # timestr = time_util.now_to_date('%Y-%m-%d') + " 01:00:00"
             # des_timestamp = time_util.date_to_timestamp(timestr)
             # now_timestamp = time_util.now_to_timestamp()
@@ -234,18 +231,20 @@ class Moments(MomentsBase):
                 if len(contents) > 0:
                     value = self.config.get_value("wx_content", "select")
                     if value == 'True':
-                        Logger.dingdingException(f"开始上传第{index}条数据")
+                        Logger.println(f"开始上传第{index}条数据")
                         res = WxUploader.uploadItems(contents)
                         # 有房源刷新的列表
                         if '20003' == res:
+                            contents[0]['content']=''
                             date = time_util.now_to_date('%Y%m%d')
-                            full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
+                            full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                                  date + "wx_pic_update_moments.xls")
                             excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
                                                           items=contents)
                             contents.clear()
                     # 新房源列表
                     if len(contents) > 0:
+                        contents[0]['content'] = ''
                         date = time_util.now_to_date('%Y%m%d')
                         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                              date + "wx_pic_moments.xls")
