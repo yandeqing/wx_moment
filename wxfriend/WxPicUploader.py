@@ -142,12 +142,12 @@ def batch_export_upload():
     value = config.get_value('appiumConfig', 'batch_pic_seconds')
     if value:
         sleeptime = int(value)
-    Logger.println(f"【开始批量导出并上传图片batch_pic_seconds={sleeptime}】")
+    Logger.println(f"【====================开始批量导出并上传图片batch_pic_seconds={sleeptime}=======================】")
     while True:
         time.sleep(5)
         time_start_time = int(time.time()) - start_time
         if sleeptime - time_start_time > 0:
-            Logger.println(f"【{sleeptime - time_start_time}秒后执行第={index}个批量导出并上传图片任务】")
+            Logger.println(f"=================【{sleeptime - time_start_time}秒后执行第={index}个批量导出并上传图片任务===================】")
         if (time_start_time) >= sleeptime:
             index = index + 1
             break
@@ -156,6 +156,9 @@ def batch_export_upload():
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
     main(full_dir)
+    if wx_stop.stopFlag:
+        Logger.println(f"【===================批量导出并上传图片任务停止=================】")
+        return
     batch_export_upload()
 
 

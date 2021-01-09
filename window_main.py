@@ -120,9 +120,10 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '按文本内容对图片分组', 'objName': 'left_label'},
                   {'label': '上传文本到后台', 'objName': 'left_label'},
                   {'label': '上传图片到后台', 'objName': 'left_label'},
+                  {'label': '开启导出图片并上传任务', 'objName': 'left_label'},
                   {'label': '恢复输入法', 'objName': 'left_label'},
-                  {'label': '停止任务', 'objName': 'left_label'},
-                  {'label': '导出图片并上传', 'objName': 'left_label'}]
+                  {'label': '停止任务', 'objName': 'left_label'}
+              ]
 
         self.buttons = []
         for index, model in enumerate(models):
@@ -151,11 +152,11 @@ class MainUi(QtWidgets.QMainWindow):
             elif index == 8:
                 btn.clicked.connect(self.clickUploadPic)
             elif index == 9:
-                btn.clicked.connect(self.clickKeyboardLabel)
-            elif index == 10:
-                btn.clicked.connect(self.clickStopLabel)
-            elif index == 11:
                 btn.clicked.connect(self.clickBatchUploadLabel)
+            elif index == 10:
+                btn.clicked.connect(self.clickKeyboardLabel)
+            elif index == 11:
+                btn.clicked.connect(self.clickStopLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
                 padding:10px;
