@@ -154,7 +154,7 @@ class MomentsBase():
 
     def swipe_down(self, _time: int = 1000):
         """
-        向上滑动
+        向下滑动
         :param driver:
         :param _time:
         :return:

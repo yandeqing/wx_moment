@@ -22,7 +22,7 @@ def get_xls(xlsPath, sheet_name=None):
     :return:
     """
     cls = []
-    file = xlrd.open_workbook(xlsPath, encoding_override=True)
+    file = xlrd.open_workbook(xlsPath)
     if sheet_name:
         sheet = file.sheet_by_name(sheet_name)
     else:

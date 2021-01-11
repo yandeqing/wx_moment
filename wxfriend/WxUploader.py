@@ -48,7 +48,7 @@ def uploadItems(array):
 
 def uploadItem(item):
     try:
-        Logger.println(f"【item={item}】")
+        Logger.println(f"uploadItem【item={item}】")
         res = requests.post("http://internal.zuker.im/moment", json=item)
         res_json = res.json()
         jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
@@ -58,6 +58,22 @@ def uploadItem(item):
     except Exception as e:
         Logger.println(f"【e={e}】")
         pass
+
+
+def need_upload_photo_item(item):
+    try:
+        Logger.println(f"【item={item}】")
+        res = requests.get("http://internal.zuker.im/moment", params=item)
+        res_json = res.json()
+        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        Logger.println(f"【need_upload_photo_item().res={jsonstr}】")
+        if res_json['code'] == 0:
+            return not res_json['file_ids']
+        else:
+            return False
+    except Exception as e:
+        Logger.println(f"【e={e}】")
+        return False
 
 
 def putItems(array):

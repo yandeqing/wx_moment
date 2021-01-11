@@ -24,7 +24,6 @@ class Moments(MomentsBase):
         # 驱动配置
         super().__init__()
         self.config = MonitorConfig()
-        self.addfriend_inte_seconds = int(WxConfig.get_addfriend_inte_seconds())
         self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
 
     def enter(self):
@@ -42,7 +41,7 @@ class Moments(MomentsBase):
         el3.click()
         sleep(3)
         # el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
-        # self.double_click(el)
+        self.swipe_down(800)
         # sleep(3)
 
     def crawl(self):
@@ -112,7 +111,7 @@ class Moments(MomentsBase):
                     self.driver.back()
                     # 延迟一段时间
                     start_time = int(time())
-                    sleeptime = self.addfriend_inte_seconds
+                    sleeptime = int(WxConfig.get_addfriend_inte_seconds())
                     Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={index}个任务】")
                     while True:
                         rdsleep = self.get_sleep(5, 6)
@@ -235,7 +234,7 @@ class Moments(MomentsBase):
                         res = WxUploader.uploadItems(contents)
                         # 有房源刷新的列表
                         if '20003' == res:
-                            contents[0]['content']=''
+                            contents[0]['content']='1'
                             date = time_util.now_to_date('%Y%m%d')
                             full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                                  date + "wx_pic_update_moments.xls")
@@ -244,7 +243,7 @@ class Moments(MomentsBase):
                             contents.clear()
                     # 新房源列表
                     if len(contents) > 0:
-                        contents[0]['content'] = ''
+                        contents[0]['content'] ='1'
                         date = time_util.now_to_date('%Y%m%d')
                         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                              date + "wx_pic_moments.xls")

@@ -22,8 +22,9 @@ def get_full_dir(path, *paths):
 
 
 def move_files_by_time(source, destination, start, end):
-    if not os.path.exists(destination):
-        os.makedirs(destination)
+    if os.path.exists(destination):
+        shutil.rmtree(destination)
+    os.makedirs(destination)
     files = []
     if os.path.isdir(source):
         lists = os.listdir(source)

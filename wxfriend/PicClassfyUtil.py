@@ -67,7 +67,10 @@ def export():
     full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic')
     weixinPath = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
     if os.path.exists(weixinPath):
-        shutil.rmtree(weixinPath)
+        try:
+            shutil.rmtree(weixinPath)
+        except:
+            pass
     deviceId = WxConfig.getAppiumConfig()["deviceName"]
     if deviceId:
         exec_shell(f'pull /sdcard/Pictures/WeiXin/ {full_dir}', deviceId=deviceId)
@@ -89,7 +92,7 @@ def classify(full_dir):
         full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
         des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
         Logger.println(FilePathUtil.move_files_by_time(full_dir, des_dir, start, end))
-    startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
+    # startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
 
 def main():
@@ -103,7 +106,7 @@ def main():
 if __name__ == '__main__':
     # setImiDefault()
     # if __name__ == '__main__':
-    main()
-#     full_dir = FilePathUtil.get_lastmodify_file(
-#         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-#     classify(full_dir)
+    # main()
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    classify(full_dir)

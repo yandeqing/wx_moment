@@ -32,7 +32,7 @@ def put_img(md5, file_ids):
                            json=item)
         res_json = res.json()
         jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-        Logger.println(f"【res={jsonstr}】")
+        Logger.println(f"put_img【res={jsonstr}】")
         if res_json['code'] == 0:
             return True
         else:
@@ -46,8 +46,8 @@ def files_token(type='image', count=1):
     try:
         res = requests.get(f"http://internal.zuker.im/files/token?type={type}&count={count}")
         res_json = res.json()
-        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-        Logger.println(f"【files_token().jsonstr={jsonstr}】")
+        # jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        # Logger.println(f"【files_token().jsonstr={jsonstr}】")
         if res_json['code'] == 0:
             return res_json['result']
         else:
@@ -91,7 +91,7 @@ def main(full_dir):
     if start_index + 1 > length:
         Logger.println(f"【已经是最后一条了】")
         return
-
+    upload_count = 0
     for index, item in enumerate(array[start_index:length]):
         if wx_stop.stopFlag:
             break
@@ -101,9 +101,10 @@ def main(full_dir):
             Logger.println(f"【{content_md5}没有抓取到图片】")
             continue
         Logger.println(f"【().content_md5={content_md5}】")
-        res = WxUploader.uploadItem(item)
+        item['content'] = '1'
+        res = WxUploader.need_upload_photo_item(item)
         # 有房源刷新的列表
-        if '20003' == res:
+        if res:
             Logger.println(f"【().开始图片上传={content_md5}】")
             try:
                 files = FilePathUtil.get_files_by_dir(
@@ -120,6 +121,7 @@ def main(full_dir):
                     join = ",".join(img_ids)
                     if join:
                         put_img(content_md5, join)
+                        upload_count += 1
                     else:
                         Logger.println(f"【content_md5={content_md5}没有对应的图片】")
                 else:
@@ -128,7 +130,9 @@ def main(full_dir):
                 Logger.println(f"【{content_md5} 图片上传失败!{e}】")
                 config.set_value("wx_content", "error_md5_pic", content_md5)
                 break
-    Logger.println(f"【本次共完成{len(array)}条朋友圈信息的图片文件上传】")
+        else:
+            Logger.println(f"【()={content_md5}无需上传图片】")
+    Logger.println(f"【本次共完成{upload_count}条朋友圈信息的图片文件上传】")
 
 
 index = 1
@@ -142,17 +146,19 @@ def batch_export_upload():
     value = config.get_value('appiumConfig', 'batch_pic_seconds')
     if value:
         sleeptime = int(value)
-    Logger.println(f"【====================开始批量导出并上传图片batch_pic_seconds={sleeptime}=======================】")
+    Logger.println(
+        f"【====================开始批量导出并上传图片batch_pic_seconds={sleeptime}=======================】")
     while True:
         time.sleep(5)
         time_start_time = int(time.time()) - start_time
         if sleeptime - time_start_time > 0:
-            Logger.println(f"=================【{sleeptime - time_start_time}秒后执行第={index}个批量导出并上传图片任务===================】")
-        if (time_start_time) >= sleeptime:
+            Logger.println(
+                f"=================【{sleeptime - time_start_time}秒后执行第={index}个批量导出并上传图片任务===================】")
+        if time_start_time >= sleeptime:
             index = index + 1
             break
         time.sleep(5)
-    PicClassfyUtil.export()
+    PicClassfyUtil.main()
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
     main(full_dir)

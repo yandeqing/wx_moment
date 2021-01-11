@@ -290,7 +290,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.boardRunthread.start()
 
     def clickBatchUploadLabel(self):
-        self.buttons[11].setEnabled(False)
+        self.buttons[9].setEnabled(False)
         self.runthread7.start()
 
 
