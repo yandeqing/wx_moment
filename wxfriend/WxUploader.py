@@ -68,7 +68,7 @@ def need_upload_photo_item(item):
         jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
         Logger.println(f"【need_upload_photo_item().res={jsonstr}】")
         if res_json['code'] == 0:
-            return not res_json['file_ids']
+            return not res_json['result']['file_ids']
         else:
             return False
     except Exception as e:
@@ -95,6 +95,10 @@ def put_item(index, item):
 
 
 if __name__ == '__main__':
-    full_dir = FilePathUtil.get_lastmodify_file(
-        FilePathUtil.get_full_dir("wxfriend", "excel", "text"))
-    main(full_dir)
+    # full_dir = FilePathUtil.get_lastmodify_file(
+    #     FilePathUtil.get_full_dir("wxfriend", "excel", "text"))
+    # main(full_dir)
+    item={}
+    item['content_md5']='e25d5e0026bb7ed11778506a75d76876'
+    photo_item = need_upload_photo_item(item)
+    print(f"【().result={photo_item}】")

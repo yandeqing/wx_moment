@@ -9,6 +9,8 @@ import os
 import shutil
 import threading
 
+from pandas import read_excel
+
 from common import FilePathUtil, excel_util, Logger
 from common.FilePathUtil import startfile
 from wxfriend import WxConfig

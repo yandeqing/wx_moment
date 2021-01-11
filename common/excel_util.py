@@ -6,7 +6,10 @@
 '''
 import os
 import re
+import urllib
+from urllib.parse import urlencode
 
+import chardet
 import xlrd
 
 import xlwt
@@ -15,6 +18,7 @@ from common import FilePathUtil, Logger, time_util
 
 proDir = FilePathUtil.getProjectRootDir()
 
+ENCODING= 'utf-8'
 
 def get_xls(xlsPath, sheet_name=None):
     """
@@ -22,7 +26,7 @@ def get_xls(xlsPath, sheet_name=None):
     :return:
     """
     cls = []
-    file = xlrd.open_workbook(xlsPath)
+    file = xlrd.open_workbook(xlsPath, encoding_override=ENCODING)
     if sheet_name:
         sheet = file.sheet_by_name(sheet_name)
     else:
@@ -39,7 +43,7 @@ def get_xls_heads(xlsPath, sheet_name=None):
     get interface data from xls file
     :return:
     """
-    file = xlrd.open_workbook(xlsPath)
+    file = xlrd.open_workbook(xlsPath, encoding_override=ENCODING)
     if sheet_name:
         sheet = file.sheet_by_name(sheet_name)
     else:
@@ -73,7 +77,7 @@ def modify(xlsx_path, sheet_name, case_name, model):
     '''
     from xlutils.copy import copy
     # 打开想要更改的excel文件
-    old_excel = xlrd.open_workbook(filename=xlsx_path)
+    old_excel = xlrd.open_workbook(filename=xlsx_path, encoding_override=ENCODING)
     # 将操作文件对象拷贝，变成可写的workbook对象
     new_excel = copy(old_excel)
     # 获得第一个sheet的对象
@@ -144,9 +148,6 @@ def rows_write(ws, row_x, rows):
 
 
 def write_excel(filename, worksheet_name, items):
-    if not os.path.exists(filename):
-        f = open(filename, "w+",encoding='utf-8')
-        f.close()
     '''
     :return:
     '''
@@ -177,7 +178,7 @@ def appendData(full_dir, items):
     # -*- coding:utf-8 -*-
     from xlrd import open_workbook
     from xlutils.copy import copy
-    r_xls = open_workbook(full_dir)  # 读取excel文件
+    r_xls = open_workbook(full_dir, encoding_override=ENCODING)  # 读取excel文件
     row = r_xls.sheets()[0].nrows  # 获取已有的行数
     excel = copy(r_xls)  # 将xlrd的对象转化为xlwt的对象
     table = excel.get_sheet(0)  # 获取要操作的sheet
@@ -223,6 +224,7 @@ def exportPhone(full_dir):
     return des_dir
 
 
+
 if __name__ == '__main__':
     # full_dir = FilePathUtil.get_full_dir("business_service/test.xls")
     # datas = [{'id': 1, 'text': "dsd", "abs": 1},
@@ -232,5 +234,11 @@ if __name__ == '__main__':
     # full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text")
     # full_dir = FilePathUtil.get_lastmodify_file(full_dir)
     # appendData(full_dir, datas)
-    full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "上架记录（1210开始）.xlsx")
-    exportPhone(full_dir)
+    # full_dir = FilePathUtil.get_lastmodify_file( FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    # get_full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic", 'test.xls')
+    # utf16leToUtf8(full_dir, get_full_dir)
+    content = "🔥《臻水岸》🔥类独栋🌼6米客厅挑空.预留电梯井.🏠带花园、双车位、南北双露台🚗毛坯.款清交房.最后10套💰总价约1300-1500万左右🎁稀缺房源，错过再无看房热线：15921824193"
+    encode = content.encode(encoding='utf-8')
+    decode = encode.decode(encoding="utf-8")
+    print(f'{decode}')
+    # exportPhone(full_dir)

@@ -11,6 +11,7 @@ from time import sleep, time
 from appium.webdriver.common.touch_action import TouchAction
 
 from common import FilePathUtil, time_util, excel_util, Logger
+from common.excel_util import ENCODING
 from config.AppConfig import MonitorConfig
 from wxfriend import wx_stop, WxUploader, WxConfig
 from wxfriend.wx_swipe_base import MomentsBase
@@ -234,7 +235,13 @@ class Moments(MomentsBase):
                         res = WxUploader.uploadItems(contents)
                         # 有房源刷新的列表
                         if '20003' == res:
-                            contents[0]['content']='1'
+                            try:
+                                content_des = contents[0]['content']
+                                encode = content_des.encode(encoding=ENCODING)
+                                contents[0]['content'] = encode.decode(encoding=ENCODING)
+                            except Exception as e:
+                                contents[0]['content'] = f"{e}"
+                                pass
                             date = time_util.now_to_date('%Y%m%d')
                             full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                                  date + "wx_pic_update_moments.xls")
@@ -243,7 +250,13 @@ class Moments(MomentsBase):
                             contents.clear()
                     # 新房源列表
                     if len(contents) > 0:
-                        contents[0]['content'] ='1'
+                        try:
+                            content_des = contents[0]['content']
+                            encode = content_des.encode(encoding=ENCODING)
+                            contents[0]['content'] = encode.decode(encoding=ENCODING)
+                        except Exception as e:
+                            contents[0]['content'] = f"{e}"
+                            pass
                         date = time_util.now_to_date('%Y%m%d')
                         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                              date + "wx_pic_moments.xls")
