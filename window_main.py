@@ -36,13 +36,13 @@ class MainUi(QtWidgets.QMainWindow):
     def openPicDir(self):
         startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
-    def exportPhone(self):
-        full_dir = FilePathUtil.get_full_dir("wxfriend", "excel")
-        filepath = self.open_file(full_dir)
-        if filepath:
-            self.call_backlog("正在提取电话号码 ,请稍后...")
-            self.runthread6.set_data(filepath)
-            self.runthread6.start()
+    # def exportPhone(self):
+    #     full_dir = FilePathUtil.get_full_dir("wxfriend", "excel")
+    #     filepath = self.open_file(full_dir)
+    #     if filepath:
+    #         self.call_backlog("正在提取电话号码 ,请稍后...")
+    #         self.runthread6.set_data(filepath)
+    #         self.runthread6.start()
 
     def download(self):
         startfile(FilePathUtil.get_full_dir('dist', 'UpgradeHelper.exe'))
@@ -72,9 +72,9 @@ class MainUi(QtWidgets.QMainWindow):
         downloadAction.setStatusTip('下载最新版本')
         downloadAction.triggered.connect(self.download)
 
-        exportAction = QAction(QIcon('exit.png'), '从"描述"字段中提取手机号', self)
-        exportAction.setStatusTip('从"描述"字段中提取手机号')
-        exportAction.triggered.connect(self.exportPhone)
+        # exportAction = QAction(QIcon('exit.png'), '从"描述"字段中提取手机号', self)
+        # exportAction.setStatusTip('从"描述"字段中提取手机号')
+        # exportAction.triggered.connect(self.exportPhone)
 
         # 底部状态栏
         self.statusBar().showMessage('状态栏')
@@ -84,8 +84,8 @@ class MainUi(QtWidgets.QMainWindow):
         menubar.setNativeMenuBar(False)
         fileMenu = menubar.addMenu('配置')
         fileMenu.addAction(configAction)
-        exMenu = menubar.addMenu('提取手机号')
-        exMenu.addAction(exportAction)
+        # exMenu = menubar.addMenu('提取手机号')
+        # exMenu.addAction(exportAction)
         picMenu = menubar.addMenu('打开图片文件夹')
         picMenu.addAction(picAction)
         downloadMenu = menubar.addMenu('版本更新')
@@ -122,7 +122,8 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '上传图片到后台', 'objName': 'left_label'},
                   {'label': '开启导出图片并上传任务', 'objName': 'left_label'},
                   {'label': '恢复输入法', 'objName': 'left_label'},
-                  {'label': '停止任务', 'objName': 'left_label'}
+                  {'label': '删除手机图片缓存', 'objName': 'left_label'},
+                  {'label': '停止任务', 'objName': 'left_label'},
               ]
 
         self.buttons = []
@@ -156,6 +157,8 @@ class MainUi(QtWidgets.QMainWindow):
             elif index == 10:
                 btn.clicked.connect(self.clickKeyboardLabel)
             elif index == 11:
+                btn.clicked.connect(self.clickClearPics)
+            elif index == 12:
                 btn.clicked.connect(self.clickStopLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
@@ -180,6 +183,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5 = Runthread(EventConst.WX_PICUPLOADER)
         self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
         self.runthread7 = Runthread(EventConst.WX_BATCH_UPLOAD)
+        self.runthread8 = Runthread(EventConst.WX_CLEAR_PIC)
         self.stopRunner = StopRunthread()
         self.boardRunthread = KeyBoardRunthread()
         self.runthread.signals.connect(self.call_backlog)
@@ -193,6 +197,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread5.signals.connect(self.call_backlog)
         self.runthread6.signals.connect(self.call_backlog)
         self.runthread7.signals.connect(self.call_backlog)
+        self.runthread8.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
         self.boardRunthread.signals.connect(self.call_backlog)
 
@@ -201,7 +206,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_label.setObjectName('right_label')
         self.right_layout.addWidget(self.right_label, 0, 0, 1, 3)
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
-        self.setWindowTitle('屋聚科技自动化运营工具V1.0')
+        self.setWindowTitle('屋聚科技自动化运营工具V2.1')
         self.setWindowIcon(QIcon('./logo.ico'))
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         # self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
@@ -292,6 +297,9 @@ class MainUi(QtWidgets.QMainWindow):
     def clickBatchUploadLabel(self):
         self.buttons[9].setEnabled(False)
         self.runthread7.start()
+
+    def clickClearPics(self):
+        self.runthread8.start()
 
 
 def main():

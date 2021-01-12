@@ -22,6 +22,7 @@ class EventConst():
     WX_PICUPLOADER = WX_UPLOADER + 1
     WX_EXPORT_PHONE = WX_PICUPLOADER + 1
     WX_BATCH_UPLOAD = WX_EXPORT_PHONE + 1
+    WX_CLEAR_PIC = WX_BATCH_UPLOAD + 1
 
 
 class DownloadRunthread(QThread):
@@ -116,6 +117,8 @@ class Runthread(QThread):
                 excel_util.exportPhone(self.data)
             elif self.fuc_code == EventConst.WX_BATCH_UPLOAD:
                 WxPicUploader.batch_export_upload()
+            elif self.fuc_code == EventConst.WX_CLEAR_PIC:
+                PicClassfyUtil.deletePictures()
             else:
                 Logger.println(f'没有响应事件={self.fuc_code}')
         except Exception as e:

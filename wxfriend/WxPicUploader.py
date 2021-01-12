@@ -5,10 +5,8 @@
 @date:  2020/12/9 18:39
 '''
 import json
-import os
 import threading
 import time
-from urllib import request
 
 import requests
 from qiniu import put_file
@@ -133,6 +131,7 @@ def main(full_dir):
         else:
             Logger.println(f"【()={content_md5}无需上传图片】")
     Logger.println(f"【本次共完成{upload_count}条朋友圈信息的图片文件上传】")
+
 
 
 index = 1

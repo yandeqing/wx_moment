@@ -56,18 +56,11 @@ class Moments(MomentsBase):
         contents = []
         finished = False
         while True:
-            # timestr = time_util.now_to_date('%Y-%m-%d') + " 01:00:00"
-            # des_timestamp = time_util.date_to_timestamp(timestr)
-            # now_timestamp = time_util.now_to_timestamp()
-            # if now_timestamp > des_timestamp:
-            #     Logger.println(f"【到达休息时间点:{time_util.now_to_date()}】")
-            #     break
             if wx_stop.stopFlag:
                 break
-            if index > 0:
-                # 上滑
-                self.swipe_up()
-                sleep(3)
+            # 上滑
+            self.swipe_up()
+            sleep(3)
             items = self.find_elements_by_id("com.tencent.mm:id/fn9")
             if items is None:
                 continue
@@ -92,8 +85,6 @@ class Moments(MomentsBase):
                 if b_e_content is None:
                     b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
                 if b_e_content is None:
-                    if index == 0:
-                        index = +1
                     Logger.println(f"【该条说说没有文本,忽略】")
                     continue
                 nickName = self.getNickName(item)
@@ -125,31 +116,6 @@ class Moments(MomentsBase):
                     break
                 if md5_ in md5_contents:
                     continue
-                wx_number = ""
-                # phone = self.get_phone(b_e_content)
-                # nick_name_element = self.getNickNameElement(item)
-                # if nick_name_element:
-                #     try:
-                #         nick_name_element.click()
-                #         sleep(1)
-                #         by_xpath_nickname = self.find_element_by_xpath("//*[contains(@text,'昵称:')]")
-                #         if by_xpath_nickname:
-                #             nickName = by_xpath_nickname.get_attribute("text").replace('昵称:',
-                #                                                                        '').strip()
-                #         by_xpath = self.find_element_by_xpath("//*[contains(@text,'微信号:')]")
-                #         if by_xpath:
-                #             wx_number = by_xpath.get_attribute("text").replace('微信号:', '').strip()
-                #             Logger.println(f"【微信号={wx_number}】")
-                #             xpath = self.find_element_by_xpath("//*[contains(@text,'电话号码')]")
-                #             if xpath:
-                #                 phone_parent = xpath.parent
-                #                 phone = self.getPhone(phone_parent)
-                #                 Logger.println(f"【phone={phone}】")
-                #                 sleep(1)
-                #             self.driver.back()
-                #     except  Exception  as e:
-                #         Logger.println(f"【nick_name_element.click.e={e}】")
-                #         pass
                 image0 = self.find_element_by_xpath(
                     "//*[@content-desc='图片']", item)
                 if image0:
@@ -173,7 +139,7 @@ class Moments(MomentsBase):
                                 data = {
                                     'content_md5': md5_,
                                     'nick_name': nickName,
-                                    'wx_number': wx_number,
+                                    'wx_number': "",
                                     'content': b_e_content,
                                     'phone': phone,
                                     'start': start,
@@ -185,8 +151,6 @@ class Moments(MomentsBase):
                                     contents.append(data)
                                 self.driver.back()
                                 break
-                            # name = f"{i}_{base_md5}.png"
-                            # if self.save_screenshot(image_detail, md5_, name):
                             try:
                                 action1 = TouchAction(self.driver)
                                 action1.long_press(el=image_detail, duration=500).perform()
@@ -213,7 +177,7 @@ class Moments(MomentsBase):
                                 data = {
                                     'content_md5': md5_,
                                     'nick_name': nickName,
-                                    'wx_number': wx_number,
+                                    'wx_number': "",
                                     'content': b_e_content,
                                     'phone': phone,
                                     'start': start,

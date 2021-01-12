@@ -7,16 +7,12 @@
 
 import os
 import shutil
-import threading
-
-from pandas import read_excel
 
 from common import FilePathUtil, excel_util, Logger
-from common.FilePathUtil import startfile
 from wxfriend import WxConfig
 
 
-def exec_shell(command, deviceId='98882048434756494f'):
+def execute_adb_shell(command, deviceId='98882048434756494f'):
     shell = f'adb -s {deviceId}  {command}'
     exe_shell(shell)
 
@@ -75,7 +71,7 @@ def export():
             pass
     deviceId = WxConfig.getAppiumConfig()["deviceName"]
     if deviceId:
-        exec_shell(f'pull /sdcard/Pictures/WeiXin/ {full_dir}', deviceId=deviceId)
+        execute_adb_shell(f'pull /sdcard/Pictures/WeiXin/ {full_dir}', deviceId=deviceId)
     else:
         Logger.println(f"【().未找到设备】")
 
@@ -105,10 +101,20 @@ def main():
     classify(full_dir)
 
 
+def deletePictures():
+    Logger.println(f"【deletePictures===========开始删除手机图片缓存========================】")
+    deviceId = WxConfig.getAppiumConfig()["deviceName"]
+    if deviceId:
+        execute_adb_shell('shell rm -r /sdcard/Pictures/WeiXin',deviceId=deviceId)
+    Logger.println(f"【deletePictures===========删除图片缓存执行完成=================】")
+
+
 if __name__ == '__main__':
-    # setImiDefault()
+    setImiDefault()
     # if __name__ == '__main__':
     # main()
-    full_dir = FilePathUtil.get_lastmodify_file(
-        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    classify(full_dir)
+    execute_adb_shell('rm -r /sdcard/Pictures/WeiXin')
+    # export()
+    # full_dir = FilePathUtil.get_lastmodify_file(
+    #     FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    # classify(full_dir)
