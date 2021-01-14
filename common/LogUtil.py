@@ -4,7 +4,9 @@ import os
 import threading
 from datetime import datetime
 
-proDir = os.path.split(os.path.realpath(__file__))[0]
+from common import FilePathUtil
+
+proDir = FilePathUtil.getProjectRootDir()
 # 开关
 debug = True
 
@@ -12,7 +14,7 @@ debug = True
 class Log:
     def __init__(self):
         global logPath, resultPath
-        resultPath = os.path.join(proDir, "result")
+        resultPath = os.path.join(proDir, "Logs")
         if not os.path.exists(resultPath):
             os.mkdir(resultPath)
         logPath = os.path.join(resultPath, str(datetime.now().strftime("%Y%m%d")))

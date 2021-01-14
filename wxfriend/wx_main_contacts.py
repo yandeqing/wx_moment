@@ -53,7 +53,7 @@ class Moments(MomentsBase):
             if index > 0:
                 # 上滑
                 self.swipe_up()
-                sleep(3)
+                sleep(0.5)
             items = self.find_elements_by_id("com.tencent.mm:id/b36")
             if items is None:
                 continue
@@ -73,7 +73,7 @@ class Moments(MomentsBase):
                 wx_number = ""
                 try:
                     item.click()
-                    sleep(1)
+                    sleep(0.5)
                     by_xpath_nickname = self.find_element_by_xpath("//*[contains(@text,'昵称:')]")
                     if by_xpath_nickname:
                         nickName = by_xpath_nickname.get_attribute("text").replace('昵称:',
@@ -87,7 +87,7 @@ class Moments(MomentsBase):
                             phone_parent = xpath.parent
                             phone = self.getPhone(phone_parent)
                             Logger.println(f"【phone={phone}】")
-                            sleep(1)
+                            sleep(0.5)
                     self.driver.back()
                 except  Exception  as e:
                     Logger.println(f"【nick_name_element.click.e={e}】")

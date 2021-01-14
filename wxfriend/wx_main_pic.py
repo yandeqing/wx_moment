@@ -26,6 +26,7 @@ class Moments(MomentsBase):
         super().__init__()
         self.config = MonitorConfig()
         self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
+        self.md5_contents = []
 
     def enter(self):
         """
@@ -45,6 +46,7 @@ class Moments(MomentsBase):
         self.swipe_down(800)
         # sleep(3)
 
+
     def crawl(self):
         self.enter()
         """
@@ -52,7 +54,7 @@ class Moments(MomentsBase):
         :return:
         """
         index = 0
-        md5_contents = []
+
         contents = []
         finished = False
         while True:
@@ -90,13 +92,16 @@ class Moments(MomentsBase):
                 nickName = self.getNickName(item)
                 phone = self.get_phone_from_txt(b_e_content)
                 md5_ = self.MD5(b_e_content)
+                if md5_ in self.md5_contents:
+                    Logger.println(f"【该条说说已经抓取过,忽略】")
+                    continue
                 if md5_ in self.wx_content_md5:
                     Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
                     md5 = None
-                    if len(md5_contents) > 1:
-                        md5 = ','.join(md5_contents[0:2])
-                    elif len(md5_contents) > 0:
-                        md5 = md5_contents[0]
+                    if len(self.md5_contents) > 1:
+                        md5 = ','.join(self.md5_contents[0:2])
+                    elif len(self.md5_contents) > 0:
+                        md5 = self.md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
                     finished = True
@@ -114,8 +119,6 @@ class Moments(MomentsBase):
                             break
                     self.crawl()
                     break
-                if md5_ in md5_contents:
-                    continue
                 image0 = self.find_element_by_xpath(
                     "//*[@content-desc='图片']", item)
                 if image0:
@@ -191,7 +194,20 @@ class Moments(MomentsBase):
                                 break
                             sleep(1)
                             self.swipeLeft()
-                    md5_contents.append(md5_)
+                else:
+                    # 纯文本
+                    data = {
+                        'content_md5': md5_,
+                        'nick_name': nickName,
+                        'wx_number': "",
+                        'content': b_e_content,
+                        'phone': phone,
+                        'start': "0",
+                        'end': "0",
+                        'crawl_time': time_util.now_to_date(),
+                        'count': "0"
+                    }
+                    contents.append(data)
                 if len(contents) > 0:
                     value = self.config.get_value("wx_content", "select")
                     if value == 'True':
@@ -212,6 +228,7 @@ class Moments(MomentsBase):
                             excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
                                                           items=contents)
                             contents.clear()
+                            self.md5_contents.append(md5_)
                     # 新房源列表
                     if len(contents) > 0:
                         try:
@@ -227,14 +244,15 @@ class Moments(MomentsBase):
                         excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
                                                       items=contents)
                         contents.clear()
+                        self.md5_contents.append(md5_)
                         index += 1
                 else:
                     Logger.println(f"【没有数据不处理】")
                 md5 = None
-                if len(md5_contents) > 1:
-                    md5 = ','.join(md5_contents[0:2])
-                elif len(md5_contents) > 0:
-                    md5 = md5_contents[0]
+                if len(self.md5_contents) > 1:
+                    md5 = ','.join(self.md5_contents[0:2])
+                elif len(self.md5_contents) > 0:
+                    md5 = self.md5_contents[0]
                 if md5:
                     self.config.set_value("wx_content", "md5_pic", md5)
 

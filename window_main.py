@@ -5,10 +5,10 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QMessageBox
 
 from ConfigBox import ConfigDialog
-from common import Logger, FilePathUtil
+from common import Logger, FilePathUtil, Exceptionhandler
 from common.FilePathUtil import startfile
 from config.AppConfig import MonitorConfig
 from wxfriend import WxConfig
@@ -114,7 +114,7 @@ class MainUi(QtWidgets.QMainWindow):
         models = [{'label': '导出微信通讯录', 'objName': 'left_label'},
                   {'label': '批量添加好友', 'objName': 'left_label'},
                   {'label': '批量修改备注为手机号', 'objName': 'left_label'},
-                  {'label': '导出有图片的文本朋友圈信息', 'objName': 'left_label'},
+                  {'label': '导出朋友圈信息', 'objName': 'left_label'},
                   {'label': '导出含文本朋友圈信息', 'objName': 'left_label'},
                   {'label': '导出图片到电脑', 'objName': 'left_label'},
                   {'label': '按文本内容对图片分组', 'objName': 'left_label'},
@@ -242,7 +242,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread01.start()
 
     def clickTextWithPicMoment(self):
-        self.call_backlog("正在导出有图片的文本朋友圈信息,请稍后...")
+        self.call_backlog("正在导出朋友圈信息,请稍后...")
         self.buttons[3].setEnabled(False)
         self.runthread1.start()
 
@@ -299,10 +299,16 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread7.start()
 
     def clickClearPics(self):
-        self.runthread8.start()
+        result = QMessageBox.warning(self, '确定', '确认删除手机Weixin文件夹?', QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.Yes)
+        if result == QMessageBox.Yes:
+            self.runthread8.start()
+
+
 
 
 def main():
+    Exceptionhandler.main()
     linesStr = list(os.popen('adb  version').readlines())
     for line in linesStr:
         Logger.println(f"{line}")
