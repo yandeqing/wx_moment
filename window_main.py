@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
+from qtpy import QtCore
 
 from ConfigBox import ConfigDialog
 from common import Logger, FilePathUtil, Exceptionhandler
@@ -31,6 +32,7 @@ class MainUi(QtWidgets.QMainWindow):
         win.setMinimumSize(720, 60)
         # 设置窗口的属性为ApplicationModal模态，用户只有关闭弹窗后，才能关闭主界面
         win.setWindowModality(Qt.ApplicationModal)
+        win.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)  # 置顶
         win.exec_()
 
     def openPicDir(self):

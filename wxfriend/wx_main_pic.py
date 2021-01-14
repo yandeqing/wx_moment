@@ -215,13 +215,7 @@ class Moments(MomentsBase):
                         res = WxUploader.uploadItems(contents)
                         # 有房源刷新的列表
                         if '20003' == res:
-                            try:
-                                content_des = contents[0]['content']
-                                encode = content_des.encode(encoding=ENCODING)
-                                contents[0]['content'] = encode.decode(encoding=ENCODING)
-                            except Exception as e:
-                                contents[0]['content'] = f"{e}"
-                                pass
+                            contents[0]['content'] = ""
                             date = time_util.now_to_date('%Y%m%d')
                             full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text",
                                                                  date + "wx_pic_update_moments.xls")
@@ -231,13 +225,7 @@ class Moments(MomentsBase):
                             self.md5_contents.append(md5_)
                     # 新房源列表
                     if len(contents) > 0:
-                        try:
-                            content_des = contents[0]['content']
-                            encode = content_des.encode(encoding=ENCODING)
-                            contents[0]['content'] = encode.decode(encoding=ENCODING)
-                        except Exception as e:
-                            contents[0]['content'] = f"{e}"
-                            pass
+                        contents[0]['content'] = ""
                         date = time_util.now_to_date('%Y%m%d')
                         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic",
                                                              date + "wx_pic_moments.xls")

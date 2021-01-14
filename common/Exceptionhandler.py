@@ -7,6 +7,7 @@
 import sys
 import time
 
+from common import Logger
 from common.LogUtil import LogUtil
 
 
@@ -23,7 +24,9 @@ def p():
 
 
 def myExcepthook(ttype, tvalue, ttraceback):
-    LogUtil.info(f"【myExcepthook(异常内容).ttype={ttype}:{tvalue}】")
+    msg = f"【myExcepthook(异常内容).ttype={ttype}:{tvalue}】"
+    Logger.dingdingException(f"应用出现闪退{msg}")
+    LogUtil.info(msg)
     i = 1
     while ttraceback:
         tracebackCode = ttraceback.tb_frame.f_code
