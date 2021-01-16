@@ -9,9 +9,10 @@ import threading
 from time import sleep, time
 
 from appium.webdriver.common.touch_action import TouchAction
+from selenium.webdriver.common.by import By
 
 from common import FilePathUtil, time_util, excel_util, Logger
-from common.excel_util import ENCODING
+from common.LogUtil import LogUtil
 from config.AppConfig import MonitorConfig
 from wxfriend import wx_stop, WxUploader, WxConfig
 from wxfriend.wx_swipe_base import MomentsBase
@@ -33,19 +34,16 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(8)
-        by_id = self.find_element_by_id('com.tencent.mm:id/czl')
+        by_id = self.wait_find_element(By.ID, 'com.tencent.mm:id/czl')
         el2 = by_id.find_element_by_xpath(
             '//android.widget.LinearLayout/android.widget.RelativeLayout[3]')
         el2.click()
-        sleep(3)
-        el3 = self.driver.find_element_by_id('com.tencent.mm:id/f43')
+        el3 = self.wait_find_element(By.ID, 'com.tencent.mm:id/f43')
         el3.click()
         sleep(3)
         # el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
         self.swipe_down(800)
         # sleep(3)
-
 
     def crawl(self):
         self.enter()
@@ -57,11 +55,15 @@ class Moments(MomentsBase):
 
         contents = []
         finished = False
+        lastItem = None
         while True:
             if wx_stop.stopFlag:
                 break
             # 上滑
-            self.swipe_up()
+            self.swipe_up_slow()
+            top_element = self.find_element_by_id('com.tencent.mm:id/bp')
+            if lastItem and top_element:
+                self.scrollElement(lastItem, top_element)
             sleep(3)
             items = self.find_elements_by_id("com.tencent.mm:id/fn9")
             if items is None:
@@ -69,6 +71,9 @@ class Moments(MomentsBase):
             if finished:
                 break
             for item in items:
+                accessibility_id = self.find_element_by_accessibility_id('头像', item)
+                if accessibility_id:
+                    lastItem = accessibility_id
                 b_e_content = None
                 last_pic_md5 = None
                 advise = self.find_element_by_xpath(
@@ -87,14 +92,14 @@ class Moments(MomentsBase):
                 if b_e_content is None:
                     b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
                 if b_e_content is None:
-                    Logger.println(f"【该条说说没有文本,忽略】")
+                    Logger.println(f"【============该条说说没有文本,忽略===========】")
                     continue
                 nickName = self.getNickName(item)
                 phone = self.get_phone_from_txt(b_e_content)
                 md5_ = self.MD5(b_e_content)
-                if md5_ in self.md5_contents:
-                    Logger.println(f"【该条说说已经抓取过,忽略】")
-                    continue
+                if len(b_e_content) > 3 and b_e_content[-3:] == '...':
+                    elment_datas = self.scan_all_text_elment(item)
+                    LogUtil.info_jsonformat(elment_datas)
                 if md5_ in self.wx_content_md5:
                     Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
                     md5 = None
@@ -119,6 +124,9 @@ class Moments(MomentsBase):
                             break
                     self.crawl()
                     break
+                if md5_ in self.md5_contents:
+                    Logger.println(f"【============该条说说已经抓取过,忽略===========】")
+                    continue
                 image0 = self.find_element_by_xpath(
                     "//*[@content-desc='图片']", item)
                 if image0:
@@ -133,7 +141,10 @@ class Moments(MomentsBase):
                             if index_img == 0:
                                 start = FilePathUtil.get_time()
                             sleep(1)
-                            text_content = self.scan_all_text_elment()
+                            text_content = ""
+                            text_contents = self.scan_all_text_elment()
+                            for item in text_contents:
+                                text_content += item['text']
                             Logger.println(f"【crawl.{index} text_content ={text_content}】")
                             pic_md5 = self.MD5(text_content)
                             if last_pic_md5 == pic_md5:
@@ -152,13 +163,15 @@ class Moments(MomentsBase):
                                 }
                                 if start != '0':
                                     contents.append(data)
+                                    self.md5_contents.append(md5_)
                                 self.driver.back()
                                 break
                             try:
                                 action1 = TouchAction(self.driver)
                                 action1.long_press(el=image_detail, duration=500).perform()
                                 sleep(1.5)
-                                saveBtn = self.find_element_by_xpath("//*[contains(@text,'保存图片')]")
+                                saveBtn = self.wait_find_element(By.XPATH,
+                                                                 "//*[contains(@text,'保存图片')]")
                                 if saveBtn:
                                     saveBtn.click()
                                 else:
@@ -190,9 +203,10 @@ class Moments(MomentsBase):
                                 }
                                 if start != '0':
                                     contents.append(data)
+                                    self.md5_contents.append(md5_)
                                 self.driver.back()
                                 break
-                            sleep(1)
+                            sleep(1.5)
                             self.swipeLeft()
                 else:
                     # 纯文本
@@ -222,7 +236,6 @@ class Moments(MomentsBase):
                             excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
                                                           items=contents)
                             contents.clear()
-                            self.md5_contents.append(md5_)
                     # 新房源列表
                     if len(contents) > 0:
                         contents[0]['content'] = ""
@@ -232,7 +245,6 @@ class Moments(MomentsBase):
                         excel_util.write_excel_append(filename=full_dir, worksheet_name=date,
                                                       items=contents)
                         contents.clear()
-                        self.md5_contents.append(md5_)
                         index += 1
                 else:
                     Logger.println(f"【没有数据不处理】")

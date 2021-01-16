@@ -126,7 +126,7 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '恢复输入法', 'objName': 'left_label'},
                   {'label': '删除手机图片缓存', 'objName': 'left_label'},
                   {'label': '停止任务', 'objName': 'left_label'},
-              ]
+                  ]
 
         self.buttons = []
         for index, model in enumerate(models):
@@ -301,12 +301,11 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread7.start()
 
     def clickClearPics(self):
-        result = QMessageBox.warning(self, '确定', '确认删除手机Weixin文件夹?', QMessageBox.Yes | QMessageBox.No,
+        result = QMessageBox.warning(self, '确定', '确认删除手机Weixin文件夹?',
+                                     QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.Yes)
         if result == QMessageBox.Yes:
             self.runthread8.start()
-
-
 
 
 def main():

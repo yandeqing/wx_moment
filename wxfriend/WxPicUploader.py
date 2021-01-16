@@ -74,6 +74,7 @@ def main(full_dir):
     error_md5_pic = config.get_value("wx_content", "error_md5_pic")
     Logger.println(f"【().excel={full_dir}】")
     array = excel_util.excel2array(full_dir)
+    array = array[::-1]
     # 错误
     start_index = 0
     length = len(array)

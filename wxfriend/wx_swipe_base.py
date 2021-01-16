@@ -7,14 +7,16 @@
 import hashlib
 import os
 import re
-from telnetlib import EC
 from time import sleep
 
+from appium.webdriver import WebElement
 from appium.webdriver.common import mobileby
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
 from appium import webdriver
+
+from selenium.webdriver.support import expected_conditions as EC
 
 from common import FilePathUtil, Logger
 from wxfriend import WxConfig
@@ -109,13 +111,10 @@ class MomentsBase():
         driver = driver or self.driver
         if not driver:
             return driver
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located(locator=(by_type, value)))
-            return driver.find_element(by_type, value)
-        except:
-            # self.logger.warning(traceback.format_exc())
-            return False
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(locator=(by_type, value)))
+        return driver.find_element(by_type, value)
+        # self.logger.warning(traceback.format_exc())
 
     def wait_find_elements(self, by_type: str, value: str, driver: WebDriver = None):
         """
@@ -152,6 +151,23 @@ class MomentsBase():
         except:
             return False
 
+    def swipe_up_slow(self):
+        """
+        向上滑动
+        :param driver:
+        :param _time:
+        :return:
+        """
+        try:
+            size = self.screen_size
+            x1 = int(size[0] * 0.5)  # 起始x坐标
+            y1 = int(size[1] *0.75)  # 起始y坐标
+            y2 = int(size[1] * 0.5)  # 终点y坐标
+            self.driver.swipe(x1, y1, x1, y2,2000)
+            return True
+        except:
+            return False
+
     def swipe_down(self, _time: int = 1000):
         """
         向下滑动
@@ -184,7 +200,26 @@ class MomentsBase():
         # 获取屏幕宽
         y = size[1]
         # 滑屏，大概从屏幕右边2分之一高度，往左侧滑动,滑动后显示的是 热点tab
-        self.driver.swipe(6 / 7 * x, 1 / 2 * y, 1 / 7 * x, 1 / 2 * y, 300)
+        self.driver.swipe(6 / 7 * x, 1 / 2 * y, 1 / 7 * x, 1 / 2 * y, 500)
+
+    def scrollElement(self, origin_el: WebElement, destination_el: WebElement):
+        size = self.screen_size
+        x1 = int(size[0] * 0.5)  # 起始x坐标
+        location_start = origin_el.location
+        location_end = destination_el.size
+        print(f"【scrollElement().location_start={location_start}】")
+        print(f"【scrollElement().location_start,={location_end}】")
+        self.driver.flick(x1, location_start['y'], x1, location_end['height'] + 40)
+        # self.driver.drag_and_drop(origin_el,destination_el)
+
+    def find_element_by_accessibility_id(self, id, driver=None):
+        driver = driver or self.driver
+        try:
+            by_id = driver.find_element_by_accessibility_id(id)
+            return by_id
+        except:
+            return None
+            pass
 
     def find_element_by_id(self, id, driver=None):
         driver = driver or self.driver
@@ -210,31 +245,44 @@ class MomentsBase():
         except:
             pass
 
-    def scan_all_text_elment(self, driver=None):
+    def scan_all_text_elment(self, driver=None, text_type='text|content-desc'):
         '''
         输出所有带文本的控件id和内容
+        :param text_type:
         :param driver:
         :return:
         '''
-        content = ""
+        contents = []
         try:
             driver = driver or self.driver
             txtItems = self.find_elements_by_xpath("//*", driver)
             if txtItems:
                 for txitem in txtItems:
-                    attribute = txitem.get_attribute('text')
-                    resourceId = txitem.get_attribute("resource-id")
-                    if attribute:
-                        Logger.println(f"【找到text文本控件resourceId={resourceId}】{attribute}")
-                        content += attribute
-                    attribute1 = txitem.get_attribute('content-desc')
-                    if attribute1:
-                        Logger.println(f"【找到content-desc文本控件resourceId={resourceId}】{attribute1}")
-                        content += attribute1
+                    split = text_type.split('|')
+                    if len(split) > 0:
+                        for type in split:
+                            content = self.get_text_elment(txitem, type)
+                            if content:
+                                contents.append(content)
         except Exception as e:
             Logger.println(f"【scan_all_text_elment().e={e}】")
             pass
-        return content
+        return contents
+
+    def get_text_elment(self, txitem, text_type='text|content-desc'):
+        attribute = txitem.get_attribute(text_type)
+        if attribute and str.strip(attribute):
+            Logger.println(f"【找到{text_type}={attribute}")
+            content = {}
+            content['text'] = attribute
+            try:
+                resourceId = txitem.get_attribute("resource-id")
+                content['resourceId'] = resourceId
+            except:
+                pass
+            return content
+        else:
+            return None
 
     def find_elements_by_xpath(self, xpath, driver=None):
         driver = driver or self.driver

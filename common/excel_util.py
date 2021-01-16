@@ -18,7 +18,8 @@ from common import FilePathUtil, Logger, time_util
 
 proDir = FilePathUtil.getProjectRootDir()
 
-ENCODING= 'utf-8'
+ENCODING = 'utf-8'
+
 
 def get_xls(xlsPath, sheet_name=None):
     """
@@ -52,20 +53,16 @@ def get_xls_heads(xlsPath, sheet_name=None):
 
 
 def excel2array(xlsPath, sheet_name=None):
-    try:
-        arrays = []
-        params_keys = get_xls_heads(xlsPath, sheet_name)
-        Logger.println(f"【excel2array().params_keys={params_keys}】")
-        params_values = get_xls(xlsPath, sheet_name)
-        for values in params_values:
-            param = {}
-            for index in range(len(params_keys)):
-                param[params_keys[index]] = values[index]
-            arrays.append(param)
-        return arrays
-    except Exception as e:
-        Logger.println(f"【excel2array().e={e}】")
-        return None
+    arrays = []
+    params_keys = get_xls_heads(xlsPath, sheet_name)
+    Logger.println(f"【excel2array().params_keys={params_keys}】")
+    params_values = get_xls(xlsPath, sheet_name)
+    for values in params_values:
+        param = {}
+        for index in range(len(params_keys)):
+            param[params_keys[index]] = values[index]
+        arrays.append(param)
+    return arrays
 
 
 def modify(xlsx_path, sheet_name, case_name, model):
@@ -222,7 +219,6 @@ def exportPhone(full_dir):
     Logger.println(f"【main().获取到电话号码={len((datas))}条】")
     FilePathUtil.startfile(des_dir)
     return des_dir
-
 
 
 if __name__ == '__main__':

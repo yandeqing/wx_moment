@@ -7,6 +7,8 @@
 import pytesseract
 from PIL import Image
 
+from common.LogUtil import LogUtil
+
 
 def recognize_img_to_text(img_path):
     img = Image.open(img_path)
@@ -17,5 +19,9 @@ def recognize_img_to_text(img_path):
 
 
 if __name__ == '__main__':
-    text = recognize_img_to_text('./pic/ocr.jpg')
-    print(text)
+    # text = recognize_img_to_text('./pic/ocr.jpg')
+    # print(text)
+    b_e_content="猜测是猜测是猜测是猜测\n是猜测是猜测是猜测是猜测是猜测是\n猜测是猜测是猜测是猜测是猜测是猜测是猜测是猜测是猜测是猜测是猜测是..."
+    print(f"【().b_e_content={b_e_content}】")
+    # if len(b_e_content) > 3 and b_e_content[-3:] == '...':
+    #    print(f"【().b_e_content={b_e_content}】")
