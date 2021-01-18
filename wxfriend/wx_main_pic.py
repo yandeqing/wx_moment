@@ -28,12 +28,13 @@ class Moments(MomentsBase):
         self.config = MonitorConfig()
         self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
         self.md5_contents = []
+        self.today_md5_contents = []
         full_dir = FilePathUtil.get_lastmodify_file(
             FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
         array = excel_util.excel2array(full_dir)
         if array:
             for item in array:
-                self.md5_contents.append(item['content_md5'])
+                self.today_md5_contents.append(item['content_md5'])
 
     def enter(self):
         """
@@ -52,6 +53,7 @@ class Moments(MomentsBase):
         # sleep(3)
 
     def crawl(self):
+        self.md5_contents = []
         self.enter()
         """
         爬取
@@ -81,8 +83,8 @@ class Moments(MomentsBase):
                 if accessibility_id:
                     lastItem = accessibility_id
                 b_e_content = None
-                last_b_e_content = ""
                 last_pic_md5 = None
+                last_md5_ = None
                 advise = self.find_element_by_xpath(
                     "//android.widget.TextView[contains(@text,'广告')]", item)
                 if advise:
@@ -107,10 +109,10 @@ class Moments(MomentsBase):
                 if len(b_e_content) > 3 and b_e_content[-3:] == '...':
                     elment_datas = self.scan_all_text_elment(item)
                     LogUtil.info_jsonformat(elment_datas)
-                contition = (last_b_e_content in self.wx_content_md5) and (
-                        md5_ in self.wx_content_md5) if last_b_e_content else md5_ in self.wx_content_md5
+                contition = (last_md5_ in self.wx_content_md5) and (
+                        md5_ in self.wx_content_md5) if last_md5_ else md5_ in self.wx_content_md5
                 if contition:
-                    Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
+                    Logger.println(f"【crawl{index}已经抓取到上一次位置md5_=({md5_},last_md5_={last_md5_}).data={b_e_content}】")
                     md5 = None
                     if len(self.md5_contents) > 1:
                         md5 = ','.join(self.md5_contents[0:2])
@@ -133,7 +135,8 @@ class Moments(MomentsBase):
                             break
                     self.crawl()
                     break
-                if md5_ in self.md5_contents:
+                if md5_ in self.today_md5_contents:
+                    last_md5_ = md5_
                     Logger.println(f"【============该条说说已经抓取过,忽略===========】")
                     continue
                 image0 = self.find_element_by_xpath(
@@ -173,7 +176,8 @@ class Moments(MomentsBase):
                                 if start != '0':
                                     contents.append(data)
                                     self.md5_contents.append(md5_)
-                                    last_b_e_content = b_e_content
+                                    self.today_md5_contents.append(md5_)
+                                    last_md5_ = md5_
                                 sleep(1.5)
                                 self.driver.back()
                                 break
@@ -222,7 +226,8 @@ class Moments(MomentsBase):
                                         f"【crawl({index}.{index_img}).已保存图片=mmexport{end}.jpg】")
                                     contents.append(data)
                                     self.md5_contents.append(md5_)
-                                    last_b_e_content = b_e_content
+                                    self.today_md5_contents.append(md5_)
+                                    last_md5_ = md5_
                                 sleep(1.5)
                                 self.driver.back()
                                 break

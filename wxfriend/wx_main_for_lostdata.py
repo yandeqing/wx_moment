@@ -26,7 +26,6 @@ class Moments(MomentsBase):
         # 驱动配置
         super().__init__()
         self.config = MonitorConfig()
-        self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
         self.md5_contents = []
         full_dir = FilePathUtil.get_lastmodify_file(
             FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
@@ -245,13 +244,6 @@ class Moments(MomentsBase):
                         index += 1
                 else:
                     Logger.println(f"【没有数据不处理】")
-                md5 = None
-                if len(self.md5_contents) > 1:
-                    md5 = ','.join(self.md5_contents[0:2])
-                elif len(self.md5_contents) > 0:
-                    md5 = self.md5_contents[0]
-                if md5:
-                    self.config.set_value("wx_content", "md5_pic", md5)
 
     def main(self):
         """
