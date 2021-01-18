@@ -65,6 +65,9 @@ class Moments(MomentsBase):
         while True:
             if wx_stop.stopFlag:
                 break
+            if index > 300:
+                Logger.println(f"【============当天补抓取数量超过{index}条,终止抓取!!!================】")
+                break
             # 上滑
             self.swipe_up_slow()
             top_element = self.find_element_by_id('com.tencent.mm:id/bp')
