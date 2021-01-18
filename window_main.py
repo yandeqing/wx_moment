@@ -51,10 +51,10 @@ class MainUi(QtWidgets.QMainWindow):
         self.close()
 
     def openPhoneDir(self):
-        startfile(FilePathUtil.get_full_dir('wxfriend', 'excel'))
+        startfile(FilePathUtil.get_full_dir('wxfriend', 'excel', 'pic'))
 
     def init_ui(self):
-        self.setMinimumSize(960, 700)
+        self.setMinimumSize(960, 760)
         self.main_widget = QtWidgets.QWidget()  # 创建窗口主部件
         self.main_layout = QtWidgets.QGridLayout()  # 创建主部件的网格布局
         self.main_widget.setLayout(self.main_layout)  # 设置窗口主部件布局为网格布局
@@ -125,6 +125,7 @@ class MainUi(QtWidgets.QMainWindow):
                   {'label': '开启导出图片并上传任务', 'objName': 'left_label'},
                   {'label': '恢复输入法', 'objName': 'left_label'},
                   {'label': '删除手机图片缓存', 'objName': 'left_label'},
+                  {'label': '抓取当天遗漏数据', 'objName': 'left_label'},
                   {'label': '停止任务', 'objName': 'left_label'},
                   ]
 
@@ -161,6 +162,8 @@ class MainUi(QtWidgets.QMainWindow):
             elif index == 11:
                 btn.clicked.connect(self.clickClearPics)
             elif index == 12:
+                btn.clicked.connect(self.clickGetLostLabel)
+            elif index == 13:
                 btn.clicked.connect(self.clickStopLabel)
         self.left_widget.setStyleSheet('''
             QPushButton#left_label{
@@ -186,6 +189,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread6 = Runthread(EventConst.WX_EXPORT_PHONE)
         self.runthread7 = Runthread(EventConst.WX_BATCH_UPLOAD)
         self.runthread8 = Runthread(EventConst.WX_CLEAR_PIC)
+        self.runthread9 = Runthread(EventConst.WX_GET_LOST_PIC)
         self.stopRunner = StopRunthread()
         self.boardRunthread = KeyBoardRunthread()
         self.runthread.signals.connect(self.call_backlog)
@@ -200,6 +204,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.runthread6.signals.connect(self.call_backlog)
         self.runthread7.signals.connect(self.call_backlog)
         self.runthread8.signals.connect(self.call_backlog)
+        self.runthread9.signals.connect(self.call_backlog)
         self.stopRunner.signals.connect(self.call_backlog)
         self.boardRunthread.signals.connect(self.call_backlog)
 
@@ -299,6 +304,10 @@ class MainUi(QtWidgets.QMainWindow):
     def clickBatchUploadLabel(self):
         self.buttons[9].setEnabled(False)
         self.runthread7.start()
+
+    def clickGetLostLabel(self):
+        self.buttons[12].setEnabled(False)
+        self.runthread9.start()
 
     def clickClearPics(self):
         result = QMessageBox.warning(self, '确定', '确认删除手机Weixin文件夹?',

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QDialog
     QApplication, QCheckBox
 from qtpy import QtCore, QtWidgets
 
-from common import FilePathUtil, Logger
+from common import FilePathUtil
 from config.AppConfig import MonitorConfig
 from wxfriend import WxConfig
 

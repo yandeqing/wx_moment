@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSignal, QThread
 
 from common import Logger, excel_util, DingDingSdk, FilePathUtil
 from wxfriend import wx_main, wx_main_pic, PicClassfyUtil, WxUploader, main_bulk_addfriend, \
-    WxPicUploader, main_bulk_modifyname_to_phone, wx_stop, wx_main_contacts
+    WxPicUploader, main_bulk_modifyname_to_phone, wx_stop, wx_main_contacts, wx_main_for_lostdata
 
 
 class EventConst():
@@ -23,6 +23,7 @@ class EventConst():
     WX_EXPORT_PHONE = WX_PICUPLOADER + 1
     WX_BATCH_UPLOAD = WX_EXPORT_PHONE + 1
     WX_CLEAR_PIC = WX_BATCH_UPLOAD + 1
+    WX_GET_LOST_PIC = WX_CLEAR_PIC + 1
 
 
 class DownloadRunthread(QThread):
@@ -119,6 +120,8 @@ class Runthread(QThread):
                 WxPicUploader.batch_export_upload()
             elif self.fuc_code == EventConst.WX_CLEAR_PIC:
                 PicClassfyUtil.deletePictures()
+            elif self.fuc_code == EventConst.WX_GET_LOST_PIC:
+                wx_main_for_lostdata.Moments().main()
             else:
                 Logger.println(f'没有响应事件={self.fuc_code}')
         except Exception as e:

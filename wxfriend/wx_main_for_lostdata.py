@@ -107,32 +107,6 @@ class Moments(MomentsBase):
                 if len(b_e_content) > 3 and b_e_content[-3:] == '...':
                     elment_datas = self.scan_all_text_elment(item)
                     LogUtil.info_jsonformat(elment_datas)
-                contition = (last_b_e_content in self.wx_content_md5) and (
-                        md5_ in self.wx_content_md5) if last_b_e_content else md5_ in self.wx_content_md5
-                if contition:
-                    Logger.println(f"【crawl{index}已经抓取到上一次位置({md5_}).data={b_e_content}】")
-                    md5 = None
-                    if len(self.md5_contents) > 1:
-                        md5 = ','.join(self.md5_contents[0:2])
-                    elif len(self.md5_contents) > 0:
-                        md5 = self.md5_contents[0]
-                    if md5:
-                        self.config.set_value("wx_content", "md5_pic", md5)
-                    finished = True
-                    self.driver.back()
-                    # 延迟一段时间
-                    start_time = int(time())
-                    sleeptime = int(WxConfig.get_addfriend_inte_seconds())
-                    Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={index}个任务】")
-                    while True:
-                        rdsleep = self.get_sleep(5, 6)
-                        if rdsleep == 5:
-                            self.scan_all_text_elment()
-                        sleep(rdsleep)
-                        if int(time()) - start_time > sleeptime:
-                            break
-                    self.crawl()
-                    break
                 if md5_ in self.md5_contents:
                     Logger.println(f"【============该条说说已经抓取过,忽略===========】")
                     continue
@@ -282,6 +256,8 @@ class Moments(MomentsBase):
         :return:
         """
         # 爬取
+        date = time_util.now_to_date('%Y-%m-%d')
+        Logger.println(f"【============开始抓取{date}遗漏数据================】")
         self.crawl()
 
     def main_backgroud(self):

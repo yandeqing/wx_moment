@@ -85,11 +85,14 @@ def classify(full_dir):
         content_md5 = item['content_md5']
         start = int(item['start'])
         end = int(item['end'])
-        Logger.println(f"【().item={item}】")
-        # 3.根据起始时间值以及md5值分类好图片
-        full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
-        des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
-        Logger.println(FilePathUtil.move_files_by_time(full_dir, des_dir, start, end))
+        count = int(item['count'])
+        if count > 0:
+            Logger.println(f"【classify().item={item}】")
+            # 3.根据起始时间值以及md5值分类好图片
+            full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
+            des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
+            files = FilePathUtil.move_files_by_time(full_dir, des_dir, start, end)
+            Logger.println(f"【{content_md5}(图片数量={count},实际图片数量={len(files)}】")
     # startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
 
@@ -110,11 +113,11 @@ def deletePictures():
 
 
 if __name__ == '__main__':
-    setImiDefault()
+    # setImiDefault()
     # if __name__ == '__main__':
     # main()
-    execute_adb_shell('rm -r /sdcard/Pictures/WeiXin')
-    # export()
-    # full_dir = FilePathUtil.get_lastmodify_file(
-    #     FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    # classify(full_dir)
+    # execute_adb_shell('rm -r /sdcard/Pictures/WeiXin')
+    export()
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    classify(full_dir)

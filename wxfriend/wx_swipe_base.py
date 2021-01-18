@@ -18,7 +18,7 @@ from appium import webdriver
 
 from selenium.webdriver.support import expected_conditions as EC
 
-from common import FilePathUtil, Logger
+from common import FilePathUtil, Logger, time_util
 from wxfriend import WxConfig
 from wxfriend.WxConfig import TIMEOUT
 
@@ -162,7 +162,7 @@ class MomentsBase():
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
             y1 = int(size[1] *0.75)  # 起始y坐标
-            y2 = int(size[1] * 0.5)  # 终点y坐标
+            y2 = int(size[1] * 0.45)  # 终点y坐标
             self.driver.swipe(x1, y1, x1, y2,2000)
             return True
         except:
@@ -178,8 +178,8 @@ class MomentsBase():
         try:
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
-            y1 = int(size[1] * 0.75)  # 起始y坐标
-            y2 = int(size[1] * 0.25)  # 终点y坐标
+            y1 = int(size[1] * 0.9)  # 起始y坐标
+            y2 = int(size[1] * 0.5)  # 终点y坐标
             self.driver.swipe(x1, y2, x1, y1, _time)
             return True
         except:
@@ -207,9 +207,12 @@ class MomentsBase():
         x1 = int(size[0] * 0.5)  # 起始x坐标
         location_start = origin_el.location
         location_end = destination_el.size
-        print(f"【scrollElement().location_start={location_start}】")
-        print(f"【scrollElement().location_start,={location_end}】")
-        self.driver.flick(x1, location_start['y'], x1, location_end['height'] + 40)
+        Logger.println(f"【scrollElement().location_start={location_start}】")
+        Logger.println(f"【scrollElement().location_start,={location_end}】")
+        y_ = location_start['y']
+        height_ = location_end['height'] + 2
+        if y_>height_:
+            self.driver.flick(x1, y_, x1, height_)
         # self.driver.drag_and_drop(origin_el,destination_el)
 
     def find_element_by_accessibility_id(self, id, driver=None):
@@ -269,7 +272,7 @@ class MomentsBase():
             pass
         return contents
 
-    def get_text_elment(self, txitem, text_type='text|content-desc'):
+    def get_text_elment(self, txitem, text_type='text'):
         attribute = txitem.get_attribute(text_type)
         if attribute and str.strip(attribute):
             Logger.println(f"【找到{text_type}={attribute}")
@@ -313,7 +316,7 @@ class MomentsBase():
             return content_element.screenshot_as_base64
         except Exception as e:
             Logger.println(f"【save_screenshot().e={e}】")
-            return FilePathUtil.get_time()
+            return time_util.get_time()
 
     def save_screenshot(self, content_element, dir, file_name):
         """

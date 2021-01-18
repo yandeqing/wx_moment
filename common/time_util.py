@@ -1,7 +1,6 @@
-import time
-
 # 生成当前时间的时间戳，只有一个参数即时间戳的位数，默认为10位，输入位数即生成相应位数的时间戳，比如可以生成常用的13位时间戳
 import math
+import time
 
 from common.LogUtil import LogUtil
 
@@ -41,6 +40,18 @@ def date_to_timestamp(date, format_string="%Y-%m-%d %H:%M:%S"):
     return time_stamp
 
 
+def get_time():
+    from time import time
+    now = int(1000 * time())
+    return str(now)
+
+
+def get_time_after(wait_time):
+    from time import time
+    now = int(1000 * (time() + wait_time))
+    return str(now)
+
+
 # 将传入的ISO8601 时间字符串，转成成指定格式的Local时区字(UTC+8)符串
 def isoStr2utc8Str(isoStr):
     # 取出timestamp，解析转成iso8601 navie datetime
@@ -78,7 +89,8 @@ def change_to_formattime(allTime):
         mins = divmod(allTime, min)
         return "%d分钟%d秒" % (int(mins[0]), math.ceil(mins[1]))
 
- # "time": "2020-01-18 09:58:35.616",
+
+# "time": "2020-01-18 09:58:35.616",
 # "@timestamp": "2020-01-18T01:58:36.224Z",
 if __name__ == '__main__':
     time_stamp = str(int(now_to_timestamp(8)))

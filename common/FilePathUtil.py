@@ -29,13 +29,15 @@ def move_files_by_time(source, destination, start, end):
     if os.path.isdir(source):
         lists = os.listdir(source)
         for fn in lists:
-            timestrap = fn.split('.')[0]
+            timestrap = str(fn).split('.')[0]
             suffix = fn.split('.')[1]
-            getmtime = int(timestrap.replace('mmexport', ''))
+            replace = timestrap.replace('mmexport', '')
+            getmtime = int(replace)
             if start <= getmtime <= end:
                 sourcefile = os.path.join(source, fn)
                 files.append(sourcefile)
                 name = f'{getmtime}.{suffix}'
+                # print(f"【move_files_by_time().={name}】")
                 desfile = os.path.join(destination, name)
                 shutil.copyfile(sourcefile, desfile)
                 # Logger.println(f"【move_files_by_time().sourcefile={sourcefile}】")
@@ -76,16 +78,12 @@ def startfile(filename):
     except:
         os.subprocess.Popen(['xdg-open', filename])
 
-def get_time():
-    from time import time
-    now = int(1000 * time())
-    Logger.println(f"【().now={now}】")
-    return str(now)
+
 
 
 if __name__ == '__main__':
-    # full_dir = get_full_dir('wxfriend', 'pic', 'WeiXin')
-    # des_dir = get_full_dir('wxfriend', 'pic', 'WeiXinCopy','content_md5')
-    # Logger.println(move_files_by_time(full_dir, des_dir, int('1607509768864'), int('1607509790533')))
+    full_dir = get_full_dir('wxfriend', 'pic', 'WeiXin')
+    des_dir = get_full_dir('wxfriend', 'pic', 'WeiXinCopy','content_md5')
+    Logger.println(move_files_by_time(full_dir, des_dir, int('1607509768864'), int('1607509790533')))
     full_dir = get_full_dir('wxfriend', 'pic', 'WeiXinCopy', '1be904df39b2fc933fd71c24a06caac9')
     get_files_by_dir(full_dir)

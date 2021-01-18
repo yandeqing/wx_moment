@@ -110,7 +110,7 @@ class Moments(MomentsBase):
                             base64 = self.get_screenshot_as_base64(image_detail)
                             base_md5 = self.MD5(base64)
                             if last_base_md5 == base_md5:
-                                end = FilePathUtil.get_time()
+                                end = time_util.get_time()
                                 data = {
                                     'content_md5': md5_,
                                     'nick_name': nickName,
@@ -126,7 +126,7 @@ class Moments(MomentsBase):
                                 self.driver.back()
                                 break
                             if index_img == 0:
-                                start = FilePathUtil.get_time()
+                                start = time_util.get_time()
                             # name = f"{i}_{base_md5}.png"
                             # if self.save_screenshot(image_detail, md5_, name):
                             try:
@@ -138,14 +138,14 @@ class Moments(MomentsBase):
                             except:
                                 continue
                                 pass
-                            time = FilePathUtil.get_time()
+                            time = time_util.get_time()
                             name = f'mmexport{time}.jpg'
                             Logger.println(f"【crawl({index}.{index_img}).已保存图片={name}】")
                             last_base_md5 = base_md5
                             is_oppo = self.desired_caps['deviceName'] == '5e8caad5'
                             if index_img == 8 or is_oppo:
                                 sleep(1)
-                                end = FilePathUtil.get_time()
+                                end = time_util.get_time()
                                 data = {
                                     'content_md5': md5_,
                                     'nick_name': nickName,
