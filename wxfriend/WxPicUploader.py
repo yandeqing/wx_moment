@@ -114,7 +114,7 @@ def main(full_dir):
                     if join:
                         put_img(content_md5, join)
                         upload_count += 1
-                        config.set_value("wx_content", "upload_md5_pic_position", index)
+                        config.set_value("wx_content", "upload_md5_pic_position", str(index))
                     else:
                         Logger.println(f"【content_md5={content_md5}没有对应的图片】")
                 else:

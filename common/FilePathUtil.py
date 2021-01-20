@@ -54,7 +54,7 @@ def get_files_by_dir(source):
         for fn in lists:
             sourcefile = os.path.join(source, fn)
             files.append(sourcefile)
-        Logger.println(f"【get_files_by_dir().files={files}】")
+        # Logger.println(f"【get_files_by_dir().files={files}】")
         return files
     else:
         return files
