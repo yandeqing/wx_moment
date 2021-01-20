@@ -29,8 +29,8 @@ def put_img(md5, file_ids):
         res = requests.put("http://internal.zuker.im/moment",
                            json=item)
         res_json = res.json()
-        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-        Logger.println(f"put_img【res={jsonstr}】")
+        # jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        # Logger.println(f"put_img【res={jsonstr}】")
         if res_json['code'] == 0:
             return True
         else:
@@ -59,8 +59,8 @@ def upload_img(token, file):
     # 要上传文件的本地路径
     ret, info = put_file(token, None, file)
     image_ = ret['result']['image']
-    Logger.println(image_['id'])
-    Logger.println(image_['src'])
+    # Logger.println(image_['id'])
+    # Logger.println(image_['src'])
     return image_['id']
 
 
@@ -71,22 +71,15 @@ def main_backgroud():
 
 def main(full_dir):
     config = MonitorConfig()
-    error_md5_pic = config.get_value("wx_content", "error_md5_pic")
+    upload_md5_pic_position = config.get_value("wx_content", "upload_md5_pic_position")
     Logger.println(f"【().excel={full_dir}】")
     array = excel_util.excel2array(full_dir)
-    array = array[::-1]
     # 错误
     start_index = 0
+    if upload_md5_pic_position:
+        Logger.println(f"【找到上次上传的下标={upload_md5_pic_position}】")
+        start_index = int(upload_md5_pic_position)
     length = len(array)
-
-    if error_md5_pic:
-        for index, item in enumerate(array):
-            content_md5 = item['content_md5']
-            if error_md5_pic == content_md5:
-                start_index = index
-                Logger.println(f"【找到上次异常的位置={start_index}={error_md5_pic}】")
-                break
-
     if start_index + 1 > length:
         Logger.println(f"【已经是最后一条了】")
         return
@@ -126,13 +119,12 @@ def main(full_dir):
                 else:
                     Logger.println(f"【token 生成失败】")
             except Exception as e:
-                Logger.println(f"【{content_md5} 图片上传失败!{e}】")
-                config.set_value("wx_content", "error_md5_pic", content_md5)
+
                 break
         else:
             Logger.println(f"【()={content_md5}无需上传图片】")
+    config.set_value("wx_content", "upload_md5_pic_position", length)
     Logger.println(f"【本次共完成{upload_count}条朋友圈信息的图片文件上传】")
-
 
 
 index = 1

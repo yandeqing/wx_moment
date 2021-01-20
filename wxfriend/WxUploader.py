@@ -36,8 +36,8 @@ def uploadItems(array):
             Logger.println(f"【({index}).item={item}】")
             res = requests.post("http://internal.zuker.im/moment", json=item)
             res_json = res.json()
-            jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-            Logger.println(f"【uploadItems({index}).res={jsonstr}】")
+            # jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+            # Logger.println(f"【uploadItems({index}).res={jsonstr}】")
             if res_json['code'] == 20003:
                 put_item(index, item)
                 return '20003'
@@ -51,8 +51,8 @@ def uploadItem(item):
         Logger.println(f"uploadItem【item={item}】")
         res = requests.post("http://internal.zuker.im/moment", json=item)
         res_json = res.json()
-        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-        Logger.println(f"【uploadItems().res={jsonstr}】")
+        # jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        # Logger.println(f"【uploadItems().res={jsonstr}】")
         if res_json['code'] == 20003:
             return '20003'
     except Exception as e:
@@ -65,8 +65,8 @@ def need_upload_photo_item(item):
         Logger.println(f"【item={item}】")
         res = requests.get("http://internal.zuker.im/moment", params=item)
         res_json = res.json()
-        jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
-        Logger.println(f"【need_upload_photo_item().res={jsonstr}】")
+        # jsonstr = json.dumps(res_json, indent=4, ensure_ascii=False)
+        # Logger.println(f"【need_upload_photo_item().res={jsonstr}】")
         if res_json['code'] == 0:
             return not res_json['result']['file_ids']
         else:

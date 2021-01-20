@@ -26,7 +26,6 @@ class Moments(MomentsBase):
         # 驱动配置
         super().__init__()
         self.config = MonitorConfig()
-        self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
         self.md5_contents = []
         self.today_md5_contents = []
         full_dir = FilePathUtil.get_lastmodify_file(
@@ -41,18 +40,17 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        by_id = self.wait_find_element(By.ID, 'com.tencent.mm:id/czl')
-        el2 = by_id.find_element_by_xpath(
-            '//android.widget.LinearLayout/android.widget.RelativeLayout[3]')
+        sleep(5)
+        el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
-        el3 = self.wait_find_element(By.ID, 'com.tencent.mm:id/f43')
+        el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")
         el3.click()
         sleep(3)
-        # el = self.driver.find_element_by_id('com.tencent.mm:id/bn')
-        self.swipe_down(800)
-        # sleep(3)
+        self.swipe_to_top()
+        sleep(3)
 
     def crawl(self):
+        self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
         self.md5_contents = []
         self.enter()
         """
@@ -60,7 +58,7 @@ class Moments(MomentsBase):
         :return:
         """
         index = 0
-
+        isFirst = True
         contents = []
         finished = False
         lastItem = None
@@ -68,12 +66,16 @@ class Moments(MomentsBase):
             if wx_stop.stopFlag:
                 break
             # 上滑
-            self.swipe_up_slow()
-            top_element = self.find_element_by_id('com.tencent.mm:id/bp')
+            if not isFirst:
+                self.swipe_up_slow()
+            isFirst = False
+            top_element = self.wait_find_element(By.XPATH,
+                                                 '//android.support.v7.widget.LinearLayoutCompat')
             if lastItem and top_element:
                 self.scrollElement(lastItem, top_element)
             sleep(3)
-            items = self.find_elements_by_id("com.tencent.mm:id/fn9")
+            items = self.wait_find_elements(By.XPATH,
+                                            '//android.widget.ListView/android.widget.RelativeLayout')
             if items is None:
                 continue
             if finished:
@@ -90,16 +92,20 @@ class Moments(MomentsBase):
                 if advise:
                     Logger.println(f"【============检测到广告忽略进入下一条================】")
                     continue
-                content_element = self.find_element_by_id("com.tencent.mm:id/b_m", item)
+                message_text_container = self.config.get_value("wx_content_ids",
+                                                               "message_text_container")
+                content_element = self.find_element_by_id(message_text_container, item)
                 if content_element:
                     content_element.click()
                     sleep(2)
-                    b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
+                    b_e_content = self.getContentText()
                     if b_e_content:
                         Logger.println(f"【获取到全文内容={b_e_content}】")
                         self.driver.back()
                 if b_e_content is None:
-                    b_e_content = self.getContentTextById("com.tencent.mm:id/b_e", item)
+                    message_text = self.config.get_value("wx_content_ids",
+                                                         "message_text")
+                    b_e_content = self.getContentTextById(message_text, item)
                 if b_e_content is None:
                     Logger.println(f"【============该条说说没有文本,忽略===========】")
                     continue
@@ -112,7 +118,8 @@ class Moments(MomentsBase):
                 contition = (last_md5_ in self.wx_content_md5) and (
                         md5_ in self.wx_content_md5) if last_md5_ else md5_ in self.wx_content_md5
                 if contition:
-                    Logger.println(f"【crawl{index}已经抓取到上一次位置md5_=({md5_},last_md5_={last_md5_}).data={b_e_content}】")
+                    Logger.println(
+                        f"【crawl{index}已经抓取到上一次位置md5_=({md5_},last_md5_={last_md5_}).data={b_e_content}】")
                     md5 = None
                     if len(self.md5_contents) > 1:
                         md5 = ','.join(self.md5_contents[0:2])
@@ -184,7 +191,6 @@ class Moments(MomentsBase):
                             try:
                                 action1 = TouchAction(self.driver)
                                 action1.long_press(el=image_detail, duration=500).perform()
-                                sleep(2)
                                 saveBtn = self.wait_find_element(By.XPATH,
                                                                  "//*[contains(@text,'保存图片')]")
                                 if saveBtn:
@@ -193,10 +199,10 @@ class Moments(MomentsBase):
                                                                      "//*[contains(@text,'图片已保存')]")
                                     attribute = element.get_attribute('text')
                                     Logger.println(f"【crawl.{index} text_content ={attribute}】")
-                                    if index_img == 0:
-                                        if attribute:
+                                    if attribute and ".jpg" in attribute:
+                                        if index_img == 0:
                                             start = get_time_from_text(attribute)
-                                    end = get_time_from_text(attribute)
+                                        end = get_time_from_text(attribute)
                                 else:
                                     Logger.dingdingException(f"找不到保存按钮,保存图片失败")
                             except Exception as e:
@@ -231,7 +237,6 @@ class Moments(MomentsBase):
                                 sleep(1.5)
                                 self.driver.back()
                                 break
-                            sleep(1.5)
                             self.swipeLeft()
                 else:
                     # 纯文本

@@ -111,10 +111,9 @@ class MomentsBase():
         driver = driver or self.driver
         if not driver:
             return driver
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located(locator=(by_type, value)))
         return driver.find_element(by_type, value)
-        # self.logger.warning(traceback.format_exc())
 
     def wait_find_elements(self, by_type: str, value: str, driver: WebDriver = None):
         """
@@ -132,7 +131,7 @@ class MomentsBase():
                 EC.presence_of_all_elements_located(locator=(by_type, value)))
             return driver.find_elements(by_type, value)
         except:
-            return False
+            return None
 
     def swipe_up(self, _time: int = 1000):
         """
@@ -161,12 +160,32 @@ class MomentsBase():
         try:
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
-            y1 = int(size[1] *0.75)  # 起始y坐标
+            y1 = int(size[1] * 0.75)  # 起始y坐标
             y2 = int(size[1] * 0.45)  # 终点y坐标
-            self.driver.swipe(x1, y1, x1, y2,2000)
+            self.driver.swipe(x1, y1, x1, y2, 2000)
             return True
         except:
             return False
+
+    def swipe_to_top(self):
+        while True:
+            source = self.driver.page_source
+            """
+            向上滑动
+            :param driver:
+            :param _time:
+            :return:
+            """
+            size = self.screen_size
+            x1 = int(size[0] * 0.5)  # 起始x坐标
+            y1 = int(size[1] * 0.75)  # 起始y坐标
+            y2 = int(size[1] * 0.5)  # 终点y坐标
+            self.driver.swipe(x1, y2, x1, y1, 1000)
+            sleep(2)
+            current_source = self.driver.page_source
+            if source == current_source:
+                Logger.println(f"【swipe_to_top().已经滑动到顶部了】")
+                break
 
     def swipe_down(self, _time: int = 1000):
         """
@@ -203,17 +222,19 @@ class MomentsBase():
         self.driver.swipe(6 / 7 * x, 1 / 2 * y, 1 / 7 * x, 1 / 2 * y, 500)
 
     def scrollElement(self, origin_el: WebElement, destination_el: WebElement):
-        size = self.screen_size
-        x1 = int(size[0] * 0.5)  # 起始x坐标
-        location_start = origin_el.location
-        location_end = destination_el.size
-        Logger.println(f"【scrollElement().location_start={location_start}】")
-        Logger.println(f"【scrollElement().location_start,={location_end}】")
-        y_ = location_start['y']
-        height_ = location_end['height'] + 2
-        if y_>height_:
-            self.driver.flick(x1, y_, x1, height_)
-        # self.driver.drag_and_drop(origin_el,destination_el)
+        try:
+            size = self.screen_size
+            x1 = int(size[0] * 0.5)  # 起始x坐标
+            location_start = origin_el.location
+            location_end = destination_el.size
+            Logger.println(f"【scrollElement().location_start={location_start}】")
+            Logger.println(f"【scrollElement().location_start,={location_end}】")
+            y_ = location_start['y']
+            height_ = location_end['height'] + 20
+            if y_ > height_:
+                self.driver.flick(x1, y_, x1, height_)
+        except Exception as e:
+            Logger.println(f"【scrollElement().e={e}】")
 
     def find_element_by_accessibility_id(self, id, driver=None):
         driver = driver or self.driver
@@ -236,6 +257,14 @@ class MomentsBase():
         driver = driver or self.driver
         try:
             by_id = driver.find_elements_by_id(id)
+            return by_id
+        except:
+            pass
+
+    def find_element_by_class_name(self, class_name, driver=None):
+        driver = driver or self.driver
+        try:
+            by_id = driver.find_element_by_class_name(class_name)
             return by_id
         except:
             pass
@@ -281,6 +310,8 @@ class MomentsBase():
             try:
                 resourceId = txitem.get_attribute("resource-id")
                 content['resourceId'] = resourceId
+                class_name = txitem.get_attribute('className')
+                content['className'] = class_name
             except:
                 pass
             return content
@@ -299,6 +330,19 @@ class MomentsBase():
         driver = driver or self.driver
         try:
             by_id = driver.find_element_by_id(id)
+            if by_id:
+                content = by_id.get_attribute("text")
+                if content is None:
+                    pass
+                Logger.println(content)
+                return content
+        except:
+            pass
+
+    def getContentText(self, driver=None):
+        driver = driver or self.driver
+        try:
+            by_id = driver.find_element_by_class_name("android.widget.TextView")
             if by_id:
                 content = by_id.get_attribute("text")
                 if content is None:
