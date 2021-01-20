@@ -25,7 +25,6 @@ class Moments(MomentsBase):
         """
         # 驱动配置
         super().__init__()
-        self.config = MonitorConfig()
         self.md5_contents = []
         self.today_md5_contents = []
         full_dir = FilePathUtil.get_lastmodify_file(
@@ -50,6 +49,7 @@ class Moments(MomentsBase):
         sleep(3)
 
     def crawl(self):
+        self.config = MonitorConfig()
         self.wx_content_md5 = self.config.get_value("wx_content", "md5_pic")
         self.md5_contents = []
         self.enter()

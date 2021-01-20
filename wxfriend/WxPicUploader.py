@@ -114,16 +114,16 @@ def main(full_dir):
                     if join:
                         put_img(content_md5, join)
                         upload_count += 1
+                        config.set_value("wx_content", "upload_md5_pic_position", index)
                     else:
                         Logger.println(f"【content_md5={content_md5}没有对应的图片】")
                 else:
                     Logger.println(f"【token 生成失败】")
             except Exception as e:
-
+                Logger.println(f"【图片文件上传失败{e}】")
                 break
         else:
             Logger.println(f"【()={content_md5}无需上传图片】")
-    config.set_value("wx_content", "upload_md5_pic_position", length)
     Logger.println(f"【本次共完成{upload_count}条朋友圈信息的图片文件上传】")
 
 
