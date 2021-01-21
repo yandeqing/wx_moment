@@ -100,6 +100,10 @@ class MomentsBase():
         else:
             return ''
 
+    def go_back(self):
+        self.driver.back()
+        Logger.println(f'===excute self.driver.back()=======')
+
     def wait_find_element(self, by_type: str, value: str, driver: WebDriver = None):
         """
         获取单个元素, 显式等待
@@ -180,7 +184,7 @@ class MomentsBase():
             x1 = int(size[0] * 0.5)  # 起始x坐标
             y1 = int(size[1] * 0.75)  # 起始y坐标
             y2 = int(size[1] * 0.5)  # 终点y坐标
-            self.driver.swipe(x1, y2, x1, y1, 1000)
+            self.driver.swipe(x1, y2, x1, y1, 100)
             sleep(2)
             current_source = self.driver.page_source
             if source == current_source:

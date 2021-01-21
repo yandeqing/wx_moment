@@ -97,11 +97,11 @@ class Moments(MomentsBase):
                 content_element = self.find_element_by_id(message_text_container, item)
                 if content_element:
                     content_element.click()
-                    sleep(2)
+                    sleep(1)
                     b_e_content = self.getContentText()
                     if b_e_content:
                         Logger.println(f"【获取到全文内容={b_e_content}】")
-                        self.driver.back()
+                        self.go_back()
                 if b_e_content is None:
                     message_text = self.config.get_value("wx_content_ids",
                                                          "message_text")
@@ -118,6 +118,8 @@ class Moments(MomentsBase):
                 contition = (last_md5_ in self.wx_content_md5) and (
                         md5_ in self.wx_content_md5) if last_md5_ else md5_ in self.wx_content_md5
                 if contition:
+                    finished = True
+                    self.go_back()
                     Logger.println(
                         f"【crawl{index}已经抓取到上一次位置md5_=({md5_},last_md5_={last_md5_}).data={b_e_content}】")
                     md5 = None
@@ -127,8 +129,6 @@ class Moments(MomentsBase):
                         md5 = self.md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
-                    finished = True
-                    self.driver.back()
                     # 延迟一段时间
                     start_time = int(time())
                     sleeptime = int(WxConfig.get_addfriend_inte_seconds())
@@ -185,8 +185,7 @@ class Moments(MomentsBase):
                                     self.md5_contents.append(md5_)
                                     self.today_md5_contents.append(md5_)
                                     last_md5_ = md5_
-                                sleep(1.5)
-                                self.driver.back()
+                                self.go_back()
                                 break
                             try:
                                 action1 = TouchAction(self.driver)
@@ -206,11 +205,10 @@ class Moments(MomentsBase):
                                 else:
                                     Logger.dingdingException(f"找不到保存按钮,保存图片失败")
                             except Exception as e:
-                                Logger.println(f'TouchAction Exception{e}')
+                                Logger.println(f'保存图片失败 TouchAction Exception{e}')
                                 Logger.dingdingException(f"保存图片失败{e}")
-                                self.driver.back()
+                                self.go_back()
                                 continue
-                                pass
                             last_pic_md5 = pic_md5
                             if index_img == 8:
                                 if not end:
@@ -234,8 +232,7 @@ class Moments(MomentsBase):
                                     self.md5_contents.append(md5_)
                                     self.today_md5_contents.append(md5_)
                                     last_md5_ = md5_
-                                sleep(1.5)
-                                self.driver.back()
+                                self.go_back()
                                 break
                             self.swipeLeft()
                 else:
@@ -299,6 +296,7 @@ class Moments(MomentsBase):
         thread.start()
 
 
+
 def get_time_from_text(text: str):
     if text:
         splits = text.split("/")
@@ -315,4 +313,5 @@ def get_time_from_text(text: str):
 if __name__ == '__main__':
     moments = Moments()
     moments.main()
+    print("ok")
     # get_time_from_text('图片已保存至/storage/emulated/0/Pictures/WeiXin/mmexport1610952572472.jpg 文件夹')

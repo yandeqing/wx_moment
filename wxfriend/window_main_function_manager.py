@@ -127,5 +127,5 @@ class Runthread(QThread):
         except Exception as e:
             Logger.println(f"【run().e={e}】")
             if self.fuc_code == EventConst.WX_MAIN_PIC:
-                Logger.dingdingException(f"{e}")
+                Logger.dingdingException(f"检测到全局异常:{e}")
         # self.signals.emit("任务已完成")
