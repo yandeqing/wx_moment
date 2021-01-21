@@ -69,16 +69,16 @@ def main_backgroud():
     thread.start()
 
 
+
 def main(full_dir):
-    config = MonitorConfig()
-    upload_md5_pic_position = config.get_value("wx_content", "upload_md5_pic_position")
+    global upload_md5_pic_position
     Logger.println(f"【().excel={full_dir}】")
     array = excel_util.excel2array(full_dir)
     # 错误
     start_index = 0
-    if upload_md5_pic_position:
+    if upload_md5_pic_position>0:
         Logger.println(f"【找到上次上传的下标={upload_md5_pic_position}】")
-        start_index = int(upload_md5_pic_position)
+        start_index = upload_md5_pic_position
     length = len(array)
     if start_index + 1 > length:
         Logger.println(f"【已经是最后一条了】")
@@ -114,7 +114,7 @@ def main(full_dir):
                     if join:
                         put_img(content_md5, join)
                         upload_count += 1
-                        config.set_value("wx_content", "upload_md5_pic_position", str(index))
+                        upload_md5_pic_position=index
                     else:
                         Logger.println(f"【content_md5={content_md5}没有对应的图片】")
                 else:
@@ -128,9 +128,11 @@ def main(full_dir):
 
 
 index = 1
-
+upload_md5_pic_position=0
 
 def batch_export_upload():
+    global upload_md5_pic_position
+    upload_md5_pic_position=0
     global index
     start_time = int(time.time())
     config = MonitorConfig()

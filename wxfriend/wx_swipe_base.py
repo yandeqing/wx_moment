@@ -112,12 +112,15 @@ class MomentsBase():
         :param value: 查找元素的方法
         :return:
         """
-        driver = driver or self.driver
-        if not driver:
-            return driver
-        WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located(locator=(by_type, value)))
-        return driver.find_element(by_type, value)
+        try:
+            driver = driver or self.driver
+            if not driver:
+                return driver
+            WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located(locator=(by_type, value)))
+            return driver.find_element(by_type, value)
+        except:
+            return None
 
     def wait_find_elements(self, by_type: str, value: str, driver: WebDriver = None):
         """
@@ -131,7 +134,7 @@ class MomentsBase():
         if not driver:
             return driver
         try:
-            WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 15).until(
                 EC.presence_of_all_elements_located(locator=(by_type, value)))
             return driver.find_elements(by_type, value)
         except:
@@ -184,8 +187,8 @@ class MomentsBase():
             x1 = int(size[0] * 0.5)  # 起始x坐标
             y1 = int(size[1] * 0.75)  # 起始y坐标
             y2 = int(size[1] * 0.5)  # 终点y坐标
-            self.driver.swipe(x1, y2, x1, y1, 100)
-            sleep(2)
+            self.driver.swipe(x1, y2, x1, y1, 200)
+            sleep(1)
             current_source = self.driver.page_source
             if source == current_source:
                 Logger.println(f"【swipe_to_top().已经滑动到顶部了】")

@@ -60,7 +60,6 @@ class Moments(MomentsBase):
         index = 0
         isFirst = True
         contents = []
-        finished = False
         lastItem = None
         while True:
             if wx_stop.stopFlag:
@@ -78,8 +77,6 @@ class Moments(MomentsBase):
                                             '//android.widget.ListView/android.widget.RelativeLayout')
             if items is None:
                 continue
-            if finished:
-                break
             for item in items:
                 accessibility_id = self.find_element_by_accessibility_id('头像', item)
                 if accessibility_id:
@@ -118,8 +115,6 @@ class Moments(MomentsBase):
                 contition = (last_md5_ in self.wx_content_md5) and (
                         md5_ in self.wx_content_md5) if last_md5_ else md5_ in self.wx_content_md5
                 if contition:
-                    finished = True
-                    self.go_back()
                     Logger.println(
                         f"【crawl{index}已经抓取到上一次位置md5_=({md5_},last_md5_={last_md5_}).data={b_e_content}】")
                     md5 = None
@@ -129,19 +124,8 @@ class Moments(MomentsBase):
                         md5 = self.md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
-                    # 延迟一段时间
-                    start_time = int(time())
-                    sleeptime = int(WxConfig.get_addfriend_inte_seconds())
-                    Logger.println(f"【main(暂时停止任务开启休闲模式).{sleeptime}秒后执行第={index}个任务】")
-                    while True:
-                        rdsleep = self.get_sleep(5, 6)
-                        if rdsleep == 5:
-                            self.scan_all_text_elment()
-                        sleep(rdsleep)
-                        if int(time()) - start_time > sleeptime:
-                            break
-                    self.crawl()
-                    break
+                    self.swipe_to_top()
+                    continue
                 if md5_ in self.today_md5_contents:
                     last_md5_ = md5_
                     Logger.println(f"【============该条说说已经抓取过,忽略===========】")

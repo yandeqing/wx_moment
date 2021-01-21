@@ -6,7 +6,7 @@
 '''
 from LAC import LAC
 
-from wxfriend.AddressUtil import get_address_by_lac
+from wxfriend.AddressUtil import get_address_by_lac, getLocFrom
 
 
 def train():
@@ -21,15 +21,21 @@ def train():
     my_lac = LAC(model_path='./LacModels/my')
 
 
-
-if __name__ == '__main__':
-    # train()
-    texts = "长中小区 中凯城市之光 凯旋路"
-    by_lac = get_address_by_lac(texts)
-    print(f"【().by_lac={by_lac}】")
-    # 装载分词模型
+def get_address_by_custom(texts):
     lac = LAC()
     lac.load_customization('./LacModels/custom.tsv', sep=None)
     # 干预后结果
     custom_result = lac.run(texts)
+    return custom_result
+
+
+if __name__ == '__main__':
+    # train()
+    texts =str.strip(" 长中小区 中凯城市之光 凯旋路 ")
+    by_lac = get_address_by_lac(texts)
+    print(f"【().standard_result={by_lac}】")
+    custom_result = get_address_by_custom(texts)
     print(f"【().custom_result={custom_result}】")
+    loc_from = getLocFrom(custom_result)
+    join = '/'.join(loc_from)
+    print(f"【().custom_result={join}】")
