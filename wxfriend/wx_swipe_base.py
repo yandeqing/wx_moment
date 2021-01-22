@@ -13,6 +13,7 @@ from appium.webdriver import WebElement
 from appium.webdriver.common import mobileby
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from appium import webdriver
 
@@ -174,6 +175,23 @@ class MomentsBase():
         except:
             return False
 
+    def swipe_up_quick(self):
+        """
+        向上滑动
+        :param driver:
+        :param _time:
+        :return:
+        """
+        try:
+            size = self.screen_size
+            x1 = int(size[0] * 0.5)  # 起始x坐标
+            y1 = int(size[1] * 0.75)  # 起始y坐标
+            y2 = int(size[1] * 0.45)  # 终点y坐标
+            self.driver.swipe(x1, y1, x1, y2, 1000)
+            return True
+        except:
+            return False
+
     def swipe_to_top(self):
         while True:
             source = self.driver.page_source
@@ -234,8 +252,6 @@ class MomentsBase():
             x1 = int(size[0] * 0.5)  # 起始x坐标
             location_start = origin_el.location
             location_end = destination_el.size
-            Logger.println(f"【scrollElement().location_start={location_start}】")
-            Logger.println(f"【scrollElement().location_start,={location_end}】")
             y_ = location_start['y']
             height_ = location_end['height'] + 20
             if y_ > height_:
@@ -336,7 +352,7 @@ class MomentsBase():
     def getContentTextById(self, id, driver=None):
         driver = driver or self.driver
         try:
-            by_id = driver.find_element_by_id(id)
+            by_id = self.find_elements_by_id(id,driver)
             if by_id:
                 content = by_id.get_attribute("text")
                 if content is None:
@@ -344,6 +360,7 @@ class MomentsBase():
                 Logger.println(content)
                 return content
         except:
+            return None
             pass
 
     def getContentText(self, driver=None):

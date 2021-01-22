@@ -96,7 +96,7 @@ class Moments(MomentsBase):
                 if content_element:
                     content_element.click()
                     sleep(2)
-                    b_e_content = self.getContentText()
+                    b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
                     if b_e_content:
                         Logger.println(f"【获取到全文内容={b_e_content}】")
                         self.driver.back()

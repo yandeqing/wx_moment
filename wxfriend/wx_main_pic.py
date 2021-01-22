@@ -94,8 +94,7 @@ class Moments(MomentsBase):
                 content_element = self.find_element_by_id(message_text_container, item)
                 if content_element:
                     content_element.click()
-                    sleep(1)
-                    b_e_content = self.getContentText()
+                    b_e_content = self.getContentTextById('com.tencent.mm:id/fpu')
                     if b_e_content:
                         Logger.println(f"【获取到全文内容={b_e_content}】")
                         self.go_back()
@@ -173,7 +172,7 @@ class Moments(MomentsBase):
                                 break
                             try:
                                 action1 = TouchAction(self.driver)
-                                action1.long_press(el=image_detail, duration=500).perform()
+                                action1.long_press(el=image_detail, duration=600).perform()
                                 saveBtn = self.wait_find_element(By.XPATH,
                                                                  "//*[contains(@text,'保存图片')]")
                                 if saveBtn:
@@ -189,8 +188,8 @@ class Moments(MomentsBase):
                                 else:
                                     Logger.dingdingException(f"找不到保存按钮,保存图片失败")
                             except Exception as e:
-                                Logger.println(f'保存图片失败 TouchAction Exception{e}')
                                 Logger.dingdingException(f"保存图片失败{e}")
+                                Logger.println(f'保存图片失败 Exception{e}')
                                 self.go_back()
                                 continue
                             last_pic_md5 = pic_md5
