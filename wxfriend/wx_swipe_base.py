@@ -105,7 +105,7 @@ class MomentsBase():
         self.driver.back()
         Logger.println(f'===excute self.driver.back()=======')
 
-    def wait_find_element(self, by_type: str, value: str, driver: WebDriver = None):
+    def wait_find_element(self, by_type: str = By.ID, value: str = None, driver: WebDriver = None):
         """
         获取单个元素, 显式等待
         :param driver: 驱动对象
@@ -352,7 +352,7 @@ class MomentsBase():
     def getContentTextById(self, id, driver=None):
         driver = driver or self.driver
         try:
-            by_id = self.find_element_by_id(id,driver)
+            by_id = self.find_element_by_id(id, driver)
             if by_id:
                 content = by_id.get_attribute("text")
                 if content is None:
@@ -366,7 +366,7 @@ class MomentsBase():
     def waitContentTextById(self, id, driver=None):
         driver = driver or self.driver
         try:
-            by_id = self.wait_find_element(id,driver)
+            by_id = self.wait_find_element(By.ID, id, driver)
             if by_id:
                 content = by_id.get_attribute("text")
                 if content is None:
@@ -376,7 +376,6 @@ class MomentsBase():
         except:
             return None
             pass
-
 
     def MD5(self, content):
         return hashlib.md5(content.encode(encoding='UTF-8')).hexdigest()

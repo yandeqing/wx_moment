@@ -94,10 +94,9 @@ class Moments(MomentsBase):
                 content_element = self.find_element_by_id(message_text_container, item)
                 if content_element:
                     content_element.click()
-                    sleep(2)
-                    b_e_content = self.waitContentTextById('com.tencent.mm:id/fpu')
+                    b_e_content = self.waitContentTextById("com.tencent.mm:id/fpu")
                     if b_e_content:
-                        Logger.println(f"【获取到全文内容={b_e_content}】")
+                        Logger.println(f"【获取到详情页面全文内容={b_e_content}】")
                         self.go_back()
                 if b_e_content is None:
                     message_text = self.config.get_value("wx_content_ids",
