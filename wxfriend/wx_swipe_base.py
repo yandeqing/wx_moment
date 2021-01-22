@@ -352,6 +352,20 @@ class MomentsBase():
     def getContentTextById(self, id, driver=None):
         driver = driver or self.driver
         try:
+            by_id = self.find_element_by_id(id,driver)
+            if by_id:
+                content = by_id.get_attribute("text")
+                if content is None:
+                    pass
+                Logger.println(content)
+                return content
+        except:
+            return None
+            pass
+
+    def waitContentTextById(self, id, driver=None):
+        driver = driver or self.driver
+        try:
             by_id = self.wait_find_element(id,driver)
             if by_id:
                 content = by_id.get_attribute("text")
@@ -363,18 +377,6 @@ class MomentsBase():
             return None
             pass
 
-    def getContentText(self, driver=None):
-        driver = driver or self.driver
-        try:
-            by_id = driver.find_element_by_class_name("android.widget.TextView")
-            if by_id:
-                content = by_id.get_attribute("text")
-                if content is None:
-                    pass
-                Logger.println(content)
-                return content
-        except:
-            pass
 
     def MD5(self, content):
         return hashlib.md5(content.encode(encoding='UTF-8')).hexdigest()
