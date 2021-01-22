@@ -352,7 +352,7 @@ class MomentsBase():
     def getContentTextById(self, id, driver=None):
         driver = driver or self.driver
         try:
-            by_id = self.find_elements_by_id(id,driver)
+            by_id = self.wait_find_element(id,driver)
             if by_id:
                 content = by_id.get_attribute("text")
                 if content is None:
