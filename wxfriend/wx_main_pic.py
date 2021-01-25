@@ -39,7 +39,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(15)
         el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")
@@ -59,11 +59,10 @@ class Moments(MomentsBase):
         """
         index = 0
         isFirst = True
-        isRestart = False
         contents = []
         lastItem = None
         while True:
-            if wx_stop.stopFlag or isRestart:
+            if wx_stop.stopFlag:
                 break
             # 上滑
             if not isFirst:
@@ -77,6 +76,7 @@ class Moments(MomentsBase):
             items = self.wait_find_elements(By.XPATH,
                                             '//android.widget.ListView/android.widget.RelativeLayout')
             if items is None:
+                Logger.println(f"【============未获取到列表================】")
                 continue
             for item in items:
                 accessibility_id = self.find_element_by_accessibility_id('头像', item)
@@ -124,10 +124,9 @@ class Moments(MomentsBase):
                         md5 = self.md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
-                    isRestart = True
-                    Logger.println(f"【============开始重启应用程序===========】")
-                    self.__init__()
-                    self.crawl()
+                    Logger.println(f"【============开始滑动到顶部===========】")
+                    Logger.dingdingException(f"本轮抓取已完成,开始滑动到顶部下拉刷新继续")
+                    self.swipe_to_top()
                     break
                 if md5_ in self.today_md5_contents:
                     last_md5_ = md5_
@@ -139,7 +138,7 @@ class Moments(MomentsBase):
                     Logger.println(
                         f"【crawl({index}).开始点击图片】")
                     image0.click()
-                    sleep(1)
+                    sleep(2)
                     start = '0'
                     end = '0'
                     for index_img in range(9):
@@ -281,7 +280,6 @@ class Moments(MomentsBase):
     def main_backgroud(self):
         thread = threading.Thread(target=self.main)
         thread.start()
-
 
 
 def get_time_from_text(text: str):

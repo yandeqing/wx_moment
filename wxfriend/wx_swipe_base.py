@@ -203,10 +203,10 @@ class MomentsBase():
             """
             size = self.screen_size
             x1 = int(size[0] * 0.5)  # 起始x坐标
-            y1 = int(size[1] * 0.75)  # 起始y坐标
+            y1 = int(size[1] * 0.8)  # 起始y坐标
             y2 = int(size[1] * 0.5)  # 终点y坐标
-            self.driver.swipe(x1, y2, x1, y1, 200)
-            sleep(1)
+            self.driver.swipe(x1, y2, x1, y1, 300)
+            sleep(1.5)
             current_source = self.driver.page_source
             if source == current_source:
                 Logger.println(f"【swipe_to_top().已经滑动到顶部了】")
