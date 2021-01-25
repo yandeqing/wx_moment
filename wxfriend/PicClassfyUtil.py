@@ -92,12 +92,11 @@ def classify(full_dir):
             full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
             des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
             files = FilePathUtil.move_files_by_time(full_dir, des_dir, start, end)
-            # Logger.println(f"【{content_md5}(图片数量={count},实际图片数量={len(files)}】")
+            Logger.println(f"【{index}.{content_md5}(图片数量={count},实际图片数量={len(files)}】")
     # startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
 
 def main():
-    # 1.手机导出微信相册
     export()
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
@@ -108,7 +107,7 @@ def deletePictures():
     Logger.println(f"【deletePictures===========开始删除手机图片缓存========================】")
     deviceId = WxConfig.getAppiumConfig()["deviceName"]
     if deviceId:
-        execute_adb_shell('shell rm -r /sdcard/Pictures/WeiXin',deviceId=deviceId)
+        execute_adb_shell('shell rm -r /sdcard/Pictures/WeiXin', deviceId=deviceId)
     Logger.println(f"【deletePictures===========删除图片缓存执行完成=================】")
 
 
@@ -117,6 +116,9 @@ if __name__ == '__main__':
     # if __name__ == '__main__':
     # main()
     # execute_adb_shell('rm -r /sdcard/Pictures/WeiXin')
+    des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy')
+    if os.path.exists(des_dir):
+        shutil.rmtree(des_dir)
     export()
     full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))

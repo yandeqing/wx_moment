@@ -12,8 +12,8 @@ import numpy as np
 import requests
 from LAC import LAC
 
-from common import Logger, csv_util
-from common.csv_util import get_head_from_arr
+from common import Logger, csv_util, time_util
+from common.csv_util import read_csv2array
 
 
 def stand_recongnize_address(location_str):
@@ -55,7 +55,7 @@ def get_address_by_lac(texts):
 
 def get_address_by_custom_lac(texts):
     lac = LAC()
-    lac.load_customization('./LacModels/custom.tsv', sep=None)
+    lac.load_customization('./LacModels/custom.csv', sep=None)
     # 干预后结果
     custom_result = lac.run(texts)
     return custom_result
@@ -98,7 +98,10 @@ def put_addresss(item):
 
 
 page = 1
-if __name__ == '__main__':
+
+
+def batch_recongnize():
+    global page
     index_position = 0
     totalpage = 1
     location_arr = []
@@ -129,10 +132,19 @@ if __name__ == '__main__':
             item['md5_content'] = md5_contents[index]
             item['address'] = '/'.join(loc_from)
             address_arr.append(item)
-            path = "address.csv"
+            path = f"address_{time_util.now_to_date('%Y-%m-%d')}.csv"
             keys = csv_util.get_head_from_arr(address_arr)
             if not os.path.exists(path):
                 csv_util.create_csv(path, keys)
             csv_util.append_csv(path, address_arr)
             # b = put_addresss(item)
             # print(f"【存储地址信息:{item},存储结果={b}】")
+
+
+if __name__ == '__main__':
+    data = read_csv2array("dict_department_simple.csv")
+    location_arr = [item['department'] for item in data]
+    addresss = get_address_by_custom_lac(location_arr)
+    address_arr = [getLocFrom(item) for item in addresss]
+    for index, item in enumerate(address_arr):
+        print(f"【().{index}.{item}】")

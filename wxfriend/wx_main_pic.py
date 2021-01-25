@@ -59,10 +59,11 @@ class Moments(MomentsBase):
         """
         index = 0
         isFirst = True
+        isRestart = False
         contents = []
         lastItem = None
         while True:
-            if wx_stop.stopFlag:
+            if wx_stop.stopFlag or isRestart:
                 break
             # 上滑
             if not isFirst:
@@ -123,8 +124,11 @@ class Moments(MomentsBase):
                         md5 = self.md5_contents[0]
                     if md5:
                         self.config.set_value("wx_content", "md5_pic", md5)
-                    self.swipe_to_top()
-                    continue
+                    isRestart = True
+                    Logger.println(f"【============开始重启应用程序===========】")
+                    self.__init__()
+                    self.crawl()
+                    break
                 if md5_ in self.today_md5_contents:
                     last_md5_ = md5_
                     Logger.println(f"【============该条说说已经抓取过,忽略===========】")

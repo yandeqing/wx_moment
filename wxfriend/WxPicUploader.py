@@ -5,6 +5,8 @@
 @date:  2020/12/9 18:39
 '''
 import json
+import os
+import shutil
 import threading
 import time
 
@@ -124,6 +126,9 @@ def main(full_dir):
         else:
             Logger.println(f"【()={content_md5}无需上传图片】")
     Logger.println(f"【本次共完成{upload_count}条朋友圈信息的图片文件上传】")
+    des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy')
+    if os.path.exists(des_dir):
+        shutil.rmtree(des_dir)
 
 
 index = 1

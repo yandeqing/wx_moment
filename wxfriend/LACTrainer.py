@@ -23,7 +23,7 @@ def train():
 
 def get_address_by_custom(texts):
     lac = LAC()
-    lac.load_customization('./LacModels/custom.tsv', sep=None)
+    lac.load_customization('./LacModels/custom.csv', sep=None)
     # 干预后结果
     custom_result = lac.run(texts)
     return custom_result

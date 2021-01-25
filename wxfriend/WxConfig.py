@@ -143,7 +143,7 @@ def getAppiumConfig():
 #     "resetKeyboard": "True"
 # }
 
-TIMEOUT = 10
+TIMEOUT = 30
 
 USERNAME = "10"
 PASSWORD = "10"
