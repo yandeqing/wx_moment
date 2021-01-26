@@ -7,7 +7,7 @@
 import json
 import requests
 
-debug = False
+debug = True
 
 
 def send_message(msg):

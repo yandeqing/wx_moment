@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QFormLayout, QDialog
     QApplication, QCheckBox
 from qtpy import QtCore, QtWidgets
 
-from common import FilePathUtil
+from common import FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
 from wxfriend import WxConfig
 
@@ -80,9 +80,15 @@ class ConfigDialog(QDialog):
             self.select_checkbox.setChecked(True)
         else:
             self.select_checkbox.setChecked(False)
-        # self.select_checkbox.stateChanged.connect(self.onQCheckBoxChange)
 
         layout.addRow(self.label7, self.select_checkbox)
+        self.label8 = QLabel("是否输出日志")
+        self.log_checkbox = QCheckBox("")
+        if Logger.debug:
+            self.log_checkbox.setChecked(True)
+        else:
+            self.log_checkbox.setChecked(False)
+        layout.addRow(self.label8, self.log_checkbox)
 
         self.cacelButton = QPushButton("重新检测")
         self.saveButton = QPushButton("保存")
@@ -116,10 +122,13 @@ class ConfigDialog(QDialog):
 
         select = self.select_checkbox.isChecked()
         self.config.set_value("wx_content", "select", str(select))
+        selectLog = self.log_checkbox.isChecked()
+        Logger.debug=selectLog
 
         batch_pic_seconds = self.le41.text()
         self.config.set_value('appiumConfig', 'batch_pic_seconds',batch_pic_seconds)
         self.close()
+
 
     def reconnect(self):
         config = WxConfig.getAppiumConfig()

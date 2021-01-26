@@ -83,8 +83,8 @@ class MomentsBase():
 
     def double_click(self, element, driver=None):
         driver = driver or self.driver
-        # action = TouchAction(driver)
-        # action.tap(element).release().tap(element).release().perform()
+        action = TouchAction(driver)
+        action.tap(element).release().wait(100).tap(element).release().perform()
         Logger.println(f'double click element({element})')
 
     def long_press(self, element, driver=None):

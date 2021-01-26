@@ -92,7 +92,7 @@ def classify(full_dir):
             full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
             des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
             files = FilePathUtil.move_files_by_time(full_dir, des_dir, start, end)
-            Logger.println(f"【{index}.{content_md5}(图片数量={count},实际图片数量={len(files)}】")
+            # Logger.println(f"【{index}.{content_md5}(图片数量={count},实际图片数量={len(files)}】")
     # startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
 

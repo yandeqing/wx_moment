@@ -45,8 +45,6 @@ class Moments(MomentsBase):
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")
         el3.click()
         sleep(3)
-        self.swipe_to_top()
-        sleep(3)
 
     def crawl(self):
         self.config = MonitorConfig()
