@@ -117,7 +117,7 @@ class Runthread(QThread):
             elif self.fuc_code == EventConst.WX_EXPORT_PHONE:
                 excel_util.exportPhone(self.data)
             elif self.fuc_code == EventConst.WX_BATCH_UPLOAD:
-                WxPicUploader.batch_export_upload()
+                WxPicUploader.batch_export_upload(self.data)
             elif self.fuc_code == EventConst.WX_CLEAR_PIC:
                 PicClassfyUtil.deletePictures()
             elif self.fuc_code == EventConst.WX_GET_LOST_PIC:

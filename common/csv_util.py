@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 
 ENCODING_GBK = 'GBK'
 ENCODING_UTF8 = 'utf-8'
@@ -69,24 +70,10 @@ def read_csv2array(path, encoding=ENCODING_UTF8):
     return arrays
 
 
-def main():
-    # 2.读csv示例
-    data = read_csv2array("dict_department.csv", encoding=ENCODING_GBK)
-    array = []
-    for index, item in enumerate(data):
-        address = {}
-        address['department'] = item['小区名']
-        address['road'] = item['道路号']
-        array.append(address)
-        print(f"【{index}.{address}】")
-
-    # 1.写csv示例
-    # array = [{'name': '小红', 'sex': 12}, {'name': '小王', 'sex': 112}]
-    path = 'dict_department_simple.csv'
-    keys = get_head_from_arr(array)
-    create_csv(path, keys)
-    append_csv(path, array)
-
-
 if __name__ == "__main__":
-    main()
+    data = read_csv2array("bjshhshenzhenhangzhou.csv", encoding=ENCODING_GBK)
+    array = []
+    for index_position, item in enumerate(data):
+        road = item['道路号']
+        if road:
+            print(f"{index_position}【main().road={item}】")

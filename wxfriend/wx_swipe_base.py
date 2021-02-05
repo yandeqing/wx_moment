@@ -253,8 +253,8 @@ class MomentsBase():
             location_start = origin_el.location
             location_end = destination_el.size
             y_ = location_start['y']
-            height_ = location_end['height'] + 20
-            if y_ > height_:
+            height_ = location_end['height'] + 40
+            if y_ >= height_:
                 self.driver.flick(x1, y_, x1, height_)
         except Exception as e:
             Logger.println(f"【scrollElement().e={e}】")
@@ -329,7 +329,7 @@ class MomentsBase():
         if attribute and str.strip(attribute):
             Logger.println(f"【找到{text_type}={attribute}")
             content = {}
-            content['text'] = attribute
+            content[text_type] = attribute
             try:
                 resourceId = txitem.get_attribute("resource-id")
                 content['resourceId'] = resourceId

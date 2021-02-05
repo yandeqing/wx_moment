@@ -11,8 +11,6 @@ from common import Logger
 from config.AppConfig import MonitorConfig
 
 
-
-
 def get_add_friend_max_count():
     config = MonitorConfig()
     addFriendMaxCount = config.get_value('appiumConfig', 'addFriendMaxCount')
@@ -32,6 +30,20 @@ def get_addfriend_inte_seconds():
     if not addfriend_inte_seconds:
         return '3600'
     return addfriend_inte_seconds
+
+
+def get_crawl_max_count():
+    config = MonitorConfig()
+    crawl_max_count = config.get_value('appiumConfig', 'crawl_max_count')
+    Logger.println(f"【crawl_max_count={crawl_max_count}】")
+    if not crawl_max_count:
+        return '100'
+    return crawl_max_count
+
+
+def set_crawl_max_count(crawl_max_count):
+    config = MonitorConfig()
+    config.set_value('appiumConfig', 'crawl_max_count', crawl_max_count)
 
 
 def set_get_addfriend_inte_seconds(addfriend_inte_seconds):
@@ -55,7 +67,6 @@ def getPhoneExcel():
 
 def setPhoneExcel(phone_excel):
     config = MonitorConfig()
-    Logger.println(f"【设置手机号excel文件={phone_excel}】")
     phone_excel = config.set_value('appiumConfig', 'phone_excel', phone_excel)
     return phone_excel
 
@@ -90,16 +101,18 @@ def setServerUrl(server_url):
     config = MonitorConfig()
     config.set_value('appiumConfig', 'driver_server', server_url)
 
+
 ##获取设备多台设备号列表
 def getDeviceid():
-    str_init=' '
-    all_info= os.popen('adb devices').readlines()
-    print('adb devices 输出的内容是：',all_info)
+    str_init = ' '
+    all_info = os.popen('adb devices').readlines()
+    print('adb devices 输出的内容是：', all_info)
     for i in range(len(all_info)):
-        str_init+=all_info[i]
-    devices_name=re.findall('\n(.+?)\t',str_init,re.S)
-    print('所有设备名称：\n',devices_name)
+        str_init += all_info[i]
+    devices_name = re.findall('\n(.+?)\t', str_init, re.S)
+    print('所有设备名称：\n', devices_name)
     return devices_name
+
 
 def getAppiumConfig():
     deviceId = ''
@@ -107,7 +120,7 @@ def getAppiumConfig():
     try:
         # 读取设备 id
         # 正则表达式匹配出 id 信息
-        deviceId =getDeviceid()[0]
+        deviceId = getDeviceid()[0]
         # readDeviceId = list(os.popen('adb devices').readlines())
         # deviceId = re.findall(r'^\w*\b', readDeviceId[1])[0]
         # 读取设备系统版本号

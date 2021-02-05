@@ -40,14 +40,12 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(15)
         el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")
         el3.click()
         sleep(3)
-        self.swipe_to_top()
-        sleep(5)
 
     def crawl(self):
         self.enter()
@@ -77,11 +75,9 @@ class Moments(MomentsBase):
             items = self.wait_find_elements(By.XPATH,
                                             '//android.widget.ListView/android.widget.RelativeLayout')
             if items:
+                lastItem = items[-1]
                 for item in items:
                     index = index + 1
-                    accessibility_id = self.find_element_by_accessibility_id('头像', item)
-                    if accessibility_id:
-                        lastItem = accessibility_id
                     elment_datas = self.scan_all_text_elment(item)
                     LogUtil.info_jsonformat(elment_datas)
 

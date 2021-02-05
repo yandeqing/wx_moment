@@ -135,7 +135,7 @@ index = 1
 upload_md5_pic_position = 0
 
 
-def batch_export_upload():
+def batch_export_upload(full_dir):
     global upload_md5_pic_position
     upload_md5_pic_position = 0
     global index
@@ -157,18 +157,18 @@ def batch_export_upload():
             index = index + 1
             break
         time.sleep(5)
-    PicClassfyUtil.main()
-    full_dir = FilePathUtil.get_lastmodify_file(
+    PicClassfyUtil.classify_from(full_dir)
+    excel_full_dir = FilePathUtil.get_lastmodify_file(
         FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    main(full_dir)
+    main(excel_full_dir)
     if wx_stop.stopFlag:
         Logger.println(f"【===================批量导出并上传图片任务停止=================】")
         return
-    batch_export_upload()
+    batch_export_upload(full_dir)
 
 
 if __name__ == '__main__':
-    batch_export_upload()
-    # full_dir = FilePathUtil.get_lastmodify_file(
-    #     FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    batch_export_upload(full_dir)
     # main(full_dir)

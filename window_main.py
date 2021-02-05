@@ -277,6 +277,11 @@ class MainUi(QtWidgets.QMainWindow):
         print(fileName, fileType)
         return fileName
 
+    def open_dir(self):
+        # 选择文件夹对话框：
+        dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择目录", "C://Users//Administrator//Desktop")
+        print(dir_path)
+        return dir_path
     def clickUploadText(self):
         full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic")
         filepath = self.open_file(full_dir)
@@ -302,8 +307,12 @@ class MainUi(QtWidgets.QMainWindow):
         self.boardRunthread.start()
 
     def clickBatchUploadLabel(self):
-        self.buttons[9].setEnabled(False)
-        self.runthread7.start()
+        filepath = self.open_dir()
+        if filepath:
+            self.runthread7.set_data(filepath)
+            self.buttons[9].setEnabled(False)
+            self.runthread7.start()
+
 
     def clickGetLostLabel(self):
         self.buttons[12].setEnabled(False)

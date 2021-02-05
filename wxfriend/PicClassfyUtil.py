@@ -92,6 +92,25 @@ def classify(full_dir):
             full_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXin')
             des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
             files = FilePathUtil.move_files_by_time(full_dir, des_dir, start, end)
+
+
+def classify_from(source_full):
+    # 2.excel获取朋友圈所有说说的md5以及图片的保存起始时间值
+    full_dir = FilePathUtil.get_lastmodify_file(
+        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    Logger.println(f"【().full_dir={full_dir}】")
+    array = excel_util.excel2array(full_dir)
+    count = 0
+    for index, item in enumerate(array):
+        content_md5 = item['content_md5']
+        start = int(item['start'])
+        end = int(item['end'])
+        count = int(item['count'])
+        if count > 0:
+            # Logger.println(f"【classify().item={item}】")
+            # 3.根据起始时间值以及md5值分类好图片
+            des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy', content_md5)
+            files = FilePathUtil.move_files_by_time(source_full, des_dir, start, end)
             # Logger.println(f"【{index}.{content_md5}(图片数量={count},实际图片数量={len(files)}】")
     # startfile(FilePathUtil.get_full_dir('wxfriend', 'pic'))
 
@@ -112,14 +131,14 @@ def deletePictures():
 
 
 if __name__ == '__main__':
-    # setImiDefault()
+    setImiDefault()
     # if __name__ == '__main__':
     # main()
     # execute_adb_shell('rm -r /sdcard/Pictures/WeiXin')
-    des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy')
-    if os.path.exists(des_dir):
-        shutil.rmtree(des_dir)
-    export()
-    full_dir = FilePathUtil.get_lastmodify_file(
-        FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
-    classify(full_dir)
+    # des_dir = FilePathUtil.get_full_dir('wxfriend', 'pic', 'WeiXinCopy')
+    # if os.path.exists(des_dir):
+    #     shutil.rmtree(des_dir)
+    # export()
+    # full_dir = FilePathUtil.get_lastmodify_file(
+    #     FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
+    # classify(full_dir)

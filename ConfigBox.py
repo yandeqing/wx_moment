@@ -43,9 +43,16 @@ class ConfigDialog(QDialog):
 
         self.label = QLabel("任务暂停后继续执行的时间间隔(秒):")
         self.le31 = QLineEdit()
-        addfriend_inte_seconds = WxConfig.get_addfriend_inte_seconds()
-        self.le31.setText(addfriend_inte_seconds)
+        max_count = WxConfig.get_addfriend_inte_seconds()
+        self.le31.setText(max_count)
         layout.addRow(self.label, self.le31)
+
+        self.label = QLabel("每次抓取任务上线数量(条):")
+        self.le32 = QLineEdit()
+        crawl_max_count = WxConfig.get_crawl_max_count()
+        self.le32.setText(crawl_max_count)
+        layout.addRow(self.label, self.le32)
+
         self.label = QLabel("批量导出图片上传脚本时间间隔(秒):")
         self.le41 = QLineEdit()
         batch_pic_seconds = self.config.get_value('appiumConfig', 'batch_pic_seconds')
@@ -113,6 +120,9 @@ class ConfigDialog(QDialog):
 
         addfriend_inte_seconds = self.le31.text()
         self.config.set_value('appiumConfig', 'addfriend_inte_seconds', addfriend_inte_seconds)
+
+        crawl_max_count = self.le32.text()
+        self.config.set_value('appiumConfig', 'crawl_max_count', crawl_max_count)
 
         md5_pic = self.le5.text()
         self.config.set_value("wx_content", "md5_pic", md5_pic)

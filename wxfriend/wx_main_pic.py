@@ -60,6 +60,11 @@ class Moments(MomentsBase):
         contents = []
         lastItem = None
         while True:
+            self.crawl_max_count = int(WxConfig.get_crawl_max_count())
+            if index % self.crawl_max_count==0:
+                self.md5_contents.clear()
+                Logger.println(f"【======={index},抓取数退出{self.crawl_max_count},本轮抓取已完成,开始滑动到顶部下拉刷新继续==========】")
+                self.swipe_to_top()
             if wx_stop.stopFlag:
                 break
             # 上滑
@@ -79,7 +84,7 @@ class Moments(MomentsBase):
             for item in items:
                 accessibility_id = self.find_element_by_accessibility_id('头像', item)
                 if accessibility_id:
-                    lastItem = accessibility_id
+                    lastItem = item
                 b_e_content = None
                 last_pic_md5 = None
                 last_md5_ = None
@@ -142,10 +147,7 @@ class Moments(MomentsBase):
                     for index_img in range(9):
                         image_detail = self.find_element_by_id('com.tencent.mm:id/c9h')
                         if image_detail:
-                            text_content = ""
-                            text_contents = self.scan_all_text_elment()
-                            for item in text_contents:
-                                text_content += item['text']
+                            text_content = self.wait_find_element(By.XPATH,"//*[contains(@content-desc,'当前')]").get_attribute('content-desc')
                             Logger.println(f"【crawl.{index} text_content ={text_content}】")
                             pic_md5 = self.MD5(text_content)
                             if last_pic_md5 == pic_md5:
@@ -173,7 +175,7 @@ class Moments(MomentsBase):
                                 break
                             try:
                                 action1 = TouchAction(self.driver)
-                                action1.long_press(el=image_detail, duration=600).perform()
+                                action1.long_press(el=image_detail, duration=500).perform()
                                 saveBtn = self.wait_find_element(By.XPATH,
                                                                  "//*[contains(@text,'保存图片')]")
                                 if saveBtn:
