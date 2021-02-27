@@ -25,6 +25,7 @@ from wxfriend.WxConfig import TIMEOUT
 
 
 class MomentsBase():
+    WAIT_TIMEOUT = 30
 
     def stop(self):
         try:

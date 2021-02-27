@@ -4,7 +4,9 @@ import configparser
 
 from common import FilePathUtil
 
-configPath =FilePathUtil.get_full_dir('config', "test_config.ini")
+configPath = FilePathUtil.get_full_dir('config', "test_config.ini")
+
+
 # configPath = os.path.join(proDir, "config.ini")
 
 
@@ -23,12 +25,16 @@ class MonitorConfig:
         self.cf.read(configPath)
 
     def get_value(self, section, name):
-        if not self.cf.__contains__(section):
-            return None
+        if not self.cf.has_section(section):
+            self.cf.add_section(section)
+        if not self.cf.has_option(section, name):
+            self.cf.set(section, name, "")
         value = self.cf.get(section, name)
         return value
 
     def set_value(self, section, name, value):
+        if not self.cf.has_section(section):
+            self.cf.add_section(section)
         self.cf.set(section, name, value)
         with open(configPath, 'w+') as f:
             self.cf.write(f)
@@ -46,3 +52,20 @@ class MonitorConfig:
     def get_qiniu(self, name):
         value = self.cf.get("QINIU", name)
         return value
+
+
+if __name__ == '__main__':
+    monitor_config = MonitorConfig()
+    config = monitor_config.cf
+    # add a section(添加一个新的section)
+    if not config.has_section('section2'):
+        config.add_section('section2')
+    # 对section1添加配置信息
+    config.set('section2', 'name', 'xiaodeng')
+    config.set('section2', 'age', '28')
+    with open(configPath, 'w+') as f:
+        config.write(f)
+        f.close()
+
+def add(a,b):
+    return a+b

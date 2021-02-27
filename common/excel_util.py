@@ -14,7 +14,8 @@ import xlrd
 
 import xlwt
 
-from common import FilePathUtil, Logger, time_util
+from common import FilePathUtil, Logger, time_util, csv_util
+from common.csv_util import ENCODING_GBK
 
 proDir = FilePathUtil.getProjectRootDir()
 
@@ -221,20 +222,38 @@ def exportPhone(full_dir):
     return des_dir
 
 
+def transfer(item):
+    return contact
+
+
 if __name__ == '__main__':
-    # full_dir = FilePathUtil.get_full_dir("business_service/test.xls")
+    full_dir = FilePathUtil.get_full_dir("./common/20210207wx_contacts_moments.xls")
+    array = excel2array(full_dir, "20210207")
+    array_new = []
+    for item in array:
+        if item['phone']:
+            contact = {}
+            # nick_name, wx_number, phone
+            contact["姓名"] = item['nick_name']
+            contact["电话"] = item['phone']
+            contact["备注"] = item['wx_number']
+            array_new.append(contact)
+    path = f'{time_util.now_to_date("%Y-%m-%d")}wx_contacts_moments.csv'
+    keys = csv_util.get_head_from_arr(array_new)
+    csv_util.create_csv(path, keys, force=True, encoding=ENCODING_GBK)
+    csv_util.append_csv(path, array_new, encoding=ENCODING_GBK)
     # datas = [{'id': 1, 'text': "dsd", "abs": 1},
     #          {'id': 2, 'text': "dsd2"},
     #          {'id': 3, 'text': "dsd3"}]
-    # # write_excel(full_dir, 'test', datas)
+    # write_excel(full_dir, 'test', datas)
     # full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "text")
     # full_dir = FilePathUtil.get_lastmodify_file(full_dir)
     # appendData(full_dir, datas)
     # full_dir = FilePathUtil.get_lastmodify_file( FilePathUtil.get_full_dir("wxfriend", "excel", "pic"))
     # get_full_dir = FilePathUtil.get_full_dir("wxfriend", "excel", "pic", 'test.xls')
     # utf16leToUtf8(full_dir, get_full_dir)
-    content = "🔥《臻水岸》🔥类独栋🌼6米客厅挑空.预留电梯井.🏠带花园、双车位、南北双露台🚗毛坯.款清交房.最后10套💰总价约1300-1500万左右🎁稀缺房源，错过再无看房热线：15921824193"
-    encode = content.encode(encoding='utf-8')
-    decode = encode.decode(encoding="utf-8")
-    print(f'{decode}')
+    # content = "🔥《臻水岸》🔥类独栋🌼6米客厅挑空.预留电梯井.🏠带花园、双车位、南北双露台🚗毛坯.款清交房.最后10套💰总价约1300-1500万左右🎁稀缺房源，错过再无看房热线：15921824193"
+    # encode = content.encode(encoding='utf-8')
+    # decode = encode.decode(encoding="utf-8")
+    # print(f'{decode}')
     # exportPhone(full_dir)

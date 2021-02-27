@@ -132,19 +132,20 @@ def batch_recongnize():
             item['md5_content'] = md5_contents[index]
             item['address'] = '/'.join(loc_from)
             address_arr.append(item)
-            path = f"address_{time_util.now_to_date('%Y-%m-%d')}.csv"
-            keys = csv_util.get_head_from_arr(address_arr)
-            if not os.path.exists(path):
-                csv_util.create_csv(path, keys)
-            csv_util.append_csv(path, address_arr)
+    path = f"address_{time_util.now_to_date('%Y-%m-%d')}.csv"
+    keys = csv_util.get_head_from_arr(address_arr)
+    if not os.path.exists(path):
+        csv_util.create_csv(path, keys)
+    csv_util.append_csv(path, address_arr)
             # b = put_addresss(item)
             # print(f"【存储地址信息:{item},存储结果={b}】")
 
 
 if __name__ == '__main__':
-    data = read_csv2array("dict_department_simple.csv")
-    location_arr = [item['department'] for item in data]
-    addresss = get_address_by_custom_lac(location_arr)
-    address_arr = [getLocFrom(item) for item in addresss]
-    for index, item in enumerate(address_arr):
-        print(f"【().{index}.{item}】")
+    batch_recongnize()
+    # data = read_csv2array("dict_department_simple.csv")
+    # location_arr = [item['department'] for item in data]
+    # addresss = get_address_by_custom_lac(location_arr)
+    # address_arr = [getLocFrom(item) for item in addresss]
+    # for index, item in enumerate(address_arr):
+    #     print(f"【().{index}.{item}】")

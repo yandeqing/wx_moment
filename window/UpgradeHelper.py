@@ -7,6 +7,7 @@ from qtpy import QtCore, QtWidgets
 
 from common import FilePathUtil
 from config.AppConfig import MonitorConfig
+from window import IconConfig
 from wxfriend import WxConfig, WxAppUploader
 from wxfriend.window_main_function_manager import DownloadRunthread
 
@@ -44,7 +45,7 @@ class UpgradeHelperDialog(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle("万能升级小工具")
-        self.setWindowIcon(QIcon('./logo.ico'))
+        self.setWindowIcon(QIcon(IconConfig.LOGO_DIR))
         self.runthread = DownloadRunthread()
         self.runthread.signals.connect(self.call_backlog)
 

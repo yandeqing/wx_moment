@@ -39,7 +39,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(15)
+        sleep(self.WAIT_TIMEOUT)
         el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")

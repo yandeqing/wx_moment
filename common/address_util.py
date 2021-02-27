@@ -10,38 +10,59 @@ from common import csv_util
 from common.csv_util import ENCODING_GBK
 
 
+def trim_region(region):
+    if '（' in region:
+        strip_index = region.index('（')
+        region = region[:strip_index + 1]
+    if '(' in region:
+        strip_index = region.index('(')
+        region = region[:strip_index + 1]
+
+    if is_region_error_format(region):
+        return None
+    return region
+
+
 def extra_region():
     # 2.读csv示例
     i = 0
     data = csv_util.read_csv2array("bjshhshenzhenhangzhou.csv", encoding=ENCODING_GBK)
     array = []
+    error_array = []
     for index, item in enumerate(data):
         region = item['小区']
-        if '（' in region:
-            strip_index = region.index('（')
-            region = region[:strip_index + 1]
-        if '(' in region:
-            strip_index = region.index('(')
-            region = region[:strip_index + 1]
-
-        if is_region_error_format(region):
-            continue
+        # region = trim_region(region)
         if region:
-            if is_region_type(region):
-                address = {}
-                address['id'] = index
-                address['city'] = item['城市']
-                address['region'] = item['区域']
-                address['department'] = item['小区']
+            address = {}
+            address['departmentId'] = index
+            address['city'] = item['城市']
+            address['region'] = item['区域']
+            address['department'] = item['小区']
+            roadStr = item['道路号']
+            if roadStr:
+                index = roadStr.index(")")
+                roadStr = str.strip(roadStr[index + 1:]).replace('，', ',')
+                address['road'] = roadStr
+            else:
+                address['road'] = ''
+            if not has_error(region):
                 array.append(address)
                 i = i + 1
                 print(f"【main({i}).road={address['city']}.{region}】")
-            # print(f"【main().road={address}】")
+            else:
+                error_array.append(address)
+
     path = 'dict_department_region.csv'
     keys = csv_util.get_head_from_arr(array)
     print(f"【main().keys={keys}】")
     csv_util.create_csv(path, keys, force=True)
     csv_util.append_csv(path, array)
+
+    path = 'dict_department_region_error.csv'
+    keys = csv_util.get_head_from_arr(error_array)
+    print(f"【main().keys={keys}】")
+    csv_util.create_csv(path, keys, force=True)
+    csv_util.append_csv(path, error_array)
 
 
 def extra_road():
@@ -61,34 +82,42 @@ def extra_road():
             split = [roadStr]
             if ',' in roadStr:
                 split = roadStr.split(",")
-            if '；' in roadStr:
+            elif '；' in roadStr:
                 split = roadStr.split("；")
                 # print(f"【main(分号分割).roadStr={roadStr}】")
             for split_item in split:
                 strip = str.strip(split_item)
                 # strip = str.strip(split_item).replace('（', '').replace('）', '') \
                 #     .replace('(', '').replace(')', '')
-                road_strip = strip
+                road_strip = strip.strip()
                 if road_strip:
-                    road_strip = trim_road(road_strip)
-                    if is_error_format(road_strip):
-                        # i = i + 1
-                        # print(f"【is_error_format({i}).road={road_strip}】")
-                        continue
+                    if len(road_strip) > 0 and ('(' in road_strip or '（' in road_strip):
+                        i = i + 1
+                        address = {}
+                        address['id'] = index_position
+                        address['road'] = road_strip
+                        address['department'] = road_strip
+                        array.append(address)
+                        print(f"【is_error_format({i}).road={road_strip}】")
+                    # road_strip = trim_road(road_strip)
+                    # if is_error_format(road_strip):
+                    #     # i = i + 1
+                    #     # print(f"【is_error_format({i}).road={road_strip}】")
+                    #     continue
                     # road_strip = road_strip.replace('（', '').replace('）', '') \
                     #     .replace('(', '').replace(')', '')
                     if is_road_type(road_strip):
                         # if '上海' in item['城市']:
                         if len(road_strip) < 11:
                             address = {}
-                            address['id'] = index_position
-                            address['city'] = item['城市']
-                            address['region'] = item['区域']
-                            address['road'] = road_strip
-                            address['department'] = item['小区']
-                            array.append(address)
-                            i = i + 1
-                            print(f"【main({i}).road={address['city']}.{road_strip}】")
+                            # address['id'] = index_position
+                            # address['city'] = item['城市']
+                            # address['region'] = item['区域']
+                            # address['road'] = road_strip
+                            # address['department'] = item['小区']
+                            # array.append(address)
+                            # i = i + 1
+                            # print(f"【main({i}).road={address['city']}.{road_strip}】")
                     else:
                         # i = i + 1
                         # print(f"【main({i}).road={road_strip}】")
@@ -99,7 +128,7 @@ def extra_road():
 
     # 1.写csv示例
     # array = [{'name': '小红', 'sex': 12}, {'name': '小王', 'sex': 112}]
-    path = 'dict_department_road.csv'
+    path = 'dict_department_road_street.csv'
     # path = 'dict_department_region.csv'
     keys = csv_util.get_head_from_arr(array)
     print(f"【main().keys={keys}】")
@@ -215,6 +244,10 @@ def is_road_type(road_strip):
     # '街' in road_strip or \
     # '号' in road_strip or \
     # '村' in road_strip and '号' in road_strip or \
+
+
+def has_error(road_strip):
+    return '?' in road_strip
 
 
 def is_region_type(road_strip):

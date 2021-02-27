@@ -8,11 +8,8 @@
 import threading
 from time import sleep
 
-from appium.webdriver.common.touch_action import TouchAction
-
 from common import FilePathUtil, time_util, excel_util, Logger
-from config.AppConfig import MonitorConfig
-from wxfriend import wx_stop, WxUploader
+from wxfriend import wx_stop
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -29,7 +26,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(self.WAIT_TIMEOUT)
         by_id = self.find_element_by_id('com.tencent.mm:id/czl')
         el2 = by_id.find_element_by_xpath(
             '//android.widget.LinearLayout/android.widget.RelativeLayout[2]')

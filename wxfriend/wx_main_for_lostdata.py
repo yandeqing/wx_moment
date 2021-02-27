@@ -6,6 +6,7 @@
 '''
 # from pymongo import MongoClient
 import threading
+from _winapi import WAIT_TIMEOUT
 from time import sleep, time
 
 from appium.webdriver.common.touch_action import TouchAction
@@ -39,7 +40,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(self.WAIT_TIMEOUT)
         el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")

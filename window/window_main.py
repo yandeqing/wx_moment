@@ -8,7 +8,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qtpy import QtCore
 
-from ConfigBox import ConfigDialog
+from window import IconConfig
+from window.ConfigBox import ConfigDialog
 from common import Logger, FilePathUtil, Exceptionhandler
 from common.FilePathUtil import startfile
 from config.AppConfig import MonitorConfig
@@ -93,7 +94,7 @@ class MainUi(QtWidgets.QMainWindow):
         downloadMenu = menubar.addMenu('版本更新')
         downloadMenu.addAction(downloadAction)
 
-        openAction = QAction(QIcon('./uploader.png'), '打开手机号配置目录', self)
+        openAction = QAction(QIcon(IconConfig.SETTING_DIR), '打开手机号配置目录', self)
         openAction.setShortcut('Ctrl+O')
         openAction.triggered.connect(self.openPhoneDir)
         self.toolbar = self.addToolBar('打开手机号配置目录')
@@ -214,7 +215,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.right_layout.addWidget(self.right_label, 0, 0, 1, 3)
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setWindowTitle('屋聚科技自动化运营工具V2.1')
-        self.setWindowIcon(QIcon('./logo.ico'))
+        self.setWindowIcon(QIcon(IconConfig.LOGO_DIR))
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         # self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         self.main_layout.setSpacing(0)
@@ -278,8 +279,17 @@ class MainUi(QtWidgets.QMainWindow):
         return fileName
 
     def open_dir(self):
-        # 选择文件夹对话框：
-        dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择目录", "C://Users//Administrator//Desktop")
+        config = MonitorConfig()
+        value = config.get_value('leidian', 'default_dir')
+        dir_path=None
+        if value:
+            # 选择文件夹对话框：
+            dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择目录", value)
+        else:
+            dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, "选择目录",
+                                                                  "C://Users//Administrator//Desktop")
+        if dir_path:
+            config.set_value('leidian', 'default_dir',dir_path)
         print(dir_path)
         return dir_path
     def clickUploadText(self):

@@ -31,7 +31,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(5)
+        sleep(self.WAIT_TIMEOUT)
         by_id = self.driver.find_element_by_id('com.tencent.mm:id/czl')
         el2 = by_id.find_element_by_xpath(
             '//android.widget.LinearLayout/android.widget.RelativeLayout[3]')

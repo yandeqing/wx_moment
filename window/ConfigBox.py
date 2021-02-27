@@ -7,6 +7,7 @@ from qtpy import QtCore, QtWidgets
 
 from common import FilePathUtil, Logger
 from config.AppConfig import MonitorConfig
+from window import IconConfig
 from wxfriend import WxConfig
 
 
@@ -108,7 +109,7 @@ class ConfigDialog(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle("配置服务器地址")
-        self.setWindowIcon(QIcon('./logo.ico'))
+        self.setWindowIcon(QIcon(IconConfig.LOGO_DIR))
 
 
     def save(self):

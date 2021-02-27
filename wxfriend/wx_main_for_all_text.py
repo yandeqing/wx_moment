@@ -6,16 +6,14 @@
 '''
 # from pymongo import MongoClient
 import threading
-from time import sleep, time
+from time import sleep
 
-from appium.webdriver.common.mobileby import MobileBy
-from appium.webdriver.common.touch_action import TouchAction
 from selenium.webdriver.common.by import By
 
-from common import time_util, time_util, excel_util, Logger, FilePathUtil
+from common import excel_util, FilePathUtil
 from common.LogUtil import LogUtil
 from config.AppConfig import MonitorConfig
-from wxfriend import wx_stop, WxUploader, WxConfig
+from wxfriend import wx_stop
 from wxfriend.wx_swipe_base import MomentsBase
 
 
@@ -40,7 +38,7 @@ class Moments(MomentsBase):
         进入朋友圈
         :return:
         """
-        sleep(15)
+        sleep(self.WAIT_TIMEOUT)
         el2 = self.wait_find_element(By.XPATH, "//*[@text='发现']")
         el2.click()
         el3 = self.wait_find_element(By.XPATH, "//*[@text='朋友圈']")
