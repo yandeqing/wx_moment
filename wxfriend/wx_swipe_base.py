@@ -42,12 +42,17 @@ class MomentsBase():
     def __init__(self):
         self.total_count = 0
         self.desired_caps = WxConfig.getAppiumConfig()
-        self.driver = webdriver.Remote(WxConfig.getServerUrl(), self.desired_caps)
-        self.wait = WebDriverWait(self.driver, TIMEOUT)
-        x = self.driver.get_window_size()['width']
-        y = self.driver.get_window_size()['height']
-        self.screen_size = [x, y]
-        self.by = mobileby.MobileBy()
+        try:
+            self.driver = webdriver.Remote(WxConfig.getServerUrl(), self.desired_caps)
+            self.wait = WebDriverWait(self.driver, TIMEOUT)
+            x = self.driver.get_window_size()['width']
+            y = self.driver.get_window_size()['height']
+            self.screen_size = [x, y]
+            self.by = mobileby.MobileBy()
+        except Exception as e:
+            print(f"{e}")
+            pass
+
         pass
 
     def getNickName(self, driver=None):

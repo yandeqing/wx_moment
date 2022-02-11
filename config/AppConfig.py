@@ -4,10 +4,10 @@ import configparser
 
 from common import FilePathUtil
 
-configPath = FilePathUtil.get_full_dir('config', "test_config.ini")
+# configPath = FilePathUtil.get_full_dir('config', "test_config.ini")
 
 
-# configPath = os.path.join(proDir, "config.ini")
+configPath = FilePathUtil.get_full_dir('config', "config.ini")
 
 
 class MonitorConfig:

@@ -7,7 +7,7 @@
 import re
 
 
-def  search_text_by_reg(reg, text):
+def search_text_by_reg(reg, text):
     try:
         search = re.search(reg, text)
         groups = search.group()
@@ -15,7 +15,8 @@ def  search_text_by_reg(reg, text):
     except:
         return None
 
-def  find_texts_by_reg(reg, text):
+
+def find_texts_by_reg(reg, text):
     try:
         searchs = re.findall(reg, text)
         return searchs
@@ -24,7 +25,13 @@ def  find_texts_by_reg(reg, text):
 
 
 if __name__ == '__main__':
-    re.compile(r'asd$')
+    testText = "江苏北路1弄125号A座"
+    road = search_text_by_reg(r'(^[\u4e00-\u9fa5]{0,})', testText)
+    if road:
+        print(road)
+    search = find_texts_by_reg(r'(\d+[\u4e00-\u9fa5]{0,})', testText)
+    print(road, search)
 
-    search = find_texts_by_reg(r'[^\u4e00-\u9fa5a-zA-Z]', "测试你好111测试记你好211")
-    print(f"【().search={search}】")
+    for index, item in enumerate(search):
+        address = {'road': road, 'level': index, 'content': item}
+        print(address)

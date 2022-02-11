@@ -82,22 +82,16 @@ def extra_region(arr):
 
 
 if __name__ == '__main__':
+    count = 0
     # batch_recongnize()
     arr = read_csv2array("2021-02-08_dict_department_region_all.csv")
-    region = extra_region(arr)
-    error_region = []
-    error_region_city = []
-    for item in region:
-        city = item.split("|")[0]
-        region = item.split("|")[1]
-        if not has_citycode(city, region):
-            error_region.append(item)
-            regions = poisearch.search_city_regions(city, region)
-            print(item,regions)
-
-            error_region_city.append(city)
-    count = 0
+    region_arr = []
     for item in arr:
-        if f"{item['city']}|{item['region']}" in error_region:
+        if '上海' in item['city'] and not "上海周边" in item['region']:
+            region_arr.append(item)
             count = count + 1
     print(f"【().count={count}】")
+    path = f'{time_util.now_to_date("%Y-%m-%d")}_dict_department_shanghai.csv'
+    keys = csv_util.get_head_from_arr(region_arr)
+    csv_util.create_csv(path, keys, force=True)
+    csv_util.append_csv(path, region_arr)

@@ -9,7 +9,7 @@ import time
 
 import requests
 
-from common import csv_util, re_util
+from common import csv_util, re_util, Bd2Gaode, LogUtil
 from common.csv_util import read_csv2array
 
 
@@ -55,8 +55,8 @@ def search(region='上海', query=None):
             if results_:
                 res = "|".join([f"{item.get('name')}{item.get('address')}" for item in results_])
                 dump = json.dumps(results_, indent=4, ensure_ascii=False)
-                print(f"【search().jsonstr={dump}】")
-            return res
+                # print(f"【search().jsonstr={dump}】")
+            return results_
         else:
             print(f"【search({query}).无关联地址】")
     else:
@@ -106,6 +106,6 @@ if __name__ == '__main__':
     # keys = csv_util.get_head_from_arr(baidu_road_arr_error)
     # csv_util.create_csv(path, keys, force=True)
     # csv_util.append_csv(path, baidu_road_arr_error)
-    road_des = search('成都', '高新')
-    if road_des:
-        print(f"【().address={road_des}】")
+    lat = search('上海', '御翠豪庭')
+    if lat:
+        print(f"【().address={lat}】")
